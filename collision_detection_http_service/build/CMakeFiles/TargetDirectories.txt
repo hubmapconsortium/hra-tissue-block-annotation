@@ -1,0 +1,5 @@
+/home/catherine/Research/CollisionDetection/http-service/build/CMakeFiles/rebuild_cache.dir
+/home/catherine/Research/CollisionDetection/http-service/build/CMakeFiles/edit_cache.dir
+/home/catherine/Research/CollisionDetection/http-service/build/CMakeFiles/client.dir
+/home/catherine/Research/CollisionDetection/http-service/build/CMakeFiles/geometry.dir
+/home/catherine/Research/CollisionDetection/http-service/build/CMakeFiles/server2.dir

@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/client.dir/client.cpp.o -o client  /usr/lib/x86_64-linux-gnu/libcpprest.so.2.10 -lpthread /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so 

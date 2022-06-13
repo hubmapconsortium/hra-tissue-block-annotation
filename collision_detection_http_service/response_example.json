@@ -1,0 +1,20 @@
+[
+    {
+        "anatomical_structure": "kidney_capsule",
+        "is_closed": "Yes",
+        "percentage": 0.062,
+        "volume": 62
+    },
+    {
+        "anatomical_structure": "renal_pyramid",
+        "is_closed": "Yes",
+        "percentage": 0.010999999999999999,
+        "volume": 11
+    },
+    {
+        "anatomical_structure": "renal_medulla",
+        "is_closed": "Yes",
+        "percentage": 0.010999999999999999,
+        "volume": 11
+    }
+]

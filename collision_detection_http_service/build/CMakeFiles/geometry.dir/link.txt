@@ -1,0 +1,2 @@
+/bin/x86_64-linux-gnu-ar qc libgeometry.a CMakeFiles/geometry.dir/geometry/algo.cpp.o CMakeFiles/geometry.dir/geometry/mymesh.cpp.o CMakeFiles/geometry.dir/geometry/utils.cpp.o
+/bin/x86_64-linux-gnu-ranlib libgeometry.a
