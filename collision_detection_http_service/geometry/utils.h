@@ -16,6 +16,20 @@ namespace fs = boost::filesystem;
 
 #define PI 3.14159265
 
+struct SpatialEntity {
+
+    SpatialEntity() = default;
+    SpatialEntity(const std::string &aso, const std::string &sse, const std::string &nn, const std::string &lb, const std::string &ro, const std::string &gf): anatomical_structure_of(aso), source_spatial_entity(sse), node_name(nn), label(lb), representation_of(ro), glb_file(gf) {};
+
+    std::string anatomical_structure_of;
+    std::string source_spatial_entity;
+    std::string node_name;
+    std::string label;
+    std::string representation_of;
+    std::string glb_file;
+
+
+};
 
 //origins, meshes
 void load_all_organs(const std::string &body_path, std::unordered_map<std::string, std::vector<Mymesh>> &total_body);
@@ -28,4 +42,4 @@ void tissue_transform(std::unordered_map<std::string, double> &params, Surface_m
 
 std::string organ_split(const std::string &url);
 
-void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, std::string> &mapping, std::unordered_map<std::string, std::string> &mapping_node_ontology, std::unordered_map<std::string, std::string> &mapping_node_label);
+void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, std::string> &mapping, std::unordered_map<std::string, SpatialEntity> &mapping_node_spatial_entity);

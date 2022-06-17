@@ -133,7 +133,7 @@ void gen_origin(const std::string &whole_model_path, std::unordered_map<std::str
     organ_origins["VH_M_Kidney_L"] = VHMLeftKidney_origin;
 }
 
-void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, std::string> &mapping, std::unordered_map<std::string, std::string> &mapping_node_ontology, std::unordered_map<std::string, std::string> &mapping_node_label)
+void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, std::string> &mapping, std::unordered_map<std::string, SpatialEntity> &mapping_node_spatial_entity)
 {
 
     mapping["#VHFLeftKidney"] = "VH_F_Kidney_L";
@@ -168,6 +168,7 @@ void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, s
         }
 
         auto anatomical_structure_of = row[0];
+        auto source_spatial_entity = row[1];
         auto node_name = row[2];
         auto label = row[3];
         auto ontologyID = row[4];
@@ -179,8 +180,10 @@ void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, s
         
         if (node_name != "-")
         {
-            mapping_node_ontology[node_name] = representation_of;
-            mapping_node_label[node_name] = label;
+            // mapping_node_ontology[node_name] = representation_of;
+            // mapping_node_label[node_name] = label;
+            SpatialEntity spatial_entity(anatomical_structure_of, source_spatial_entity, node_name, label, representation_of, glb_file);
+            mapping_node_spatial_entity[node_name] = spatial_entity; 
 
         }
 
@@ -200,7 +203,8 @@ std::string organ_split(const std::string &url)
     if (url.substr(len-4, len) == "V1.1") tmp = url.substr(0, len-4);
     else tmp = url;
 
-    size_t pos = tmp.find("#");    
-    return tmp.substr(pos);
+    size_t start = tmp.find("#"); 
+    size_t end = tmp.find("_");
+    return tmp.substr(start, end - start);
 
 }

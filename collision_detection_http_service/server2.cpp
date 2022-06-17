@@ -17,12 +17,12 @@ using namespace web::http::experimental::listener;
 
 //global variables
 std::map<utility::string_t, utility::string_t> dictionary;
-std::unordered_map<std::string, Eigen::Vector3d> organ_origins;
-std::unordered_map<std::string, std::string> mapping;
-std::unordered_map<std::string, std::vector<Mymesh>> total_body;
-std::unordered_map<std::string, std::string> mapping_node_ontology;
-std::unordered_map<std::string, std::string> mapping_node_label;
+std::unordered_map<std::string, Eigen::Vector3d> organ_origins;                     //origins of organs
+std::unordered_map<std::string, std::string> mapping;                               //mapping from standard organ name(e.g., #VHFLeftKidney) to glb file name without suffix(e.g., VH_F_Kidney_L)
+std::unordered_map<std::string, std::vector<Mymesh>> total_body;                    //mapping from organ name(glb file name) to vector of meshes of a certain organ
+std::unordered_map<std::string, SpatialEntity> mapping_node_spatial_entity;         // mapping from AS to its information in asct-b table 
 
+//display json
 void display_json(
    json::value const & jvalue,
    utility::string_t const & prefix)
@@ -30,12 +30,25 @@ void display_json(
    std::cout << prefix << jvalue.serialize() << std::endl;
 }
 
+//parse json
 void parse_json(json::value const &jvalue, json::value &answer)
 {
 
    std::unordered_map<std::string, double> params;
-   auto target = jvalue.at("target").as_string();
 
+
+   auto target = jvalue.at("target").as_string();
+   auto tmp = organ_split(target); 
+   std::cout << "target url: " << target << " target: " << tmp << " " << std::endl;
+   
+   // only test for kidneys, will test other organs soon.
+   if (!(tmp == "#VHFLeftKidney" || tmp == "#VHFRightKidney" || tmp == "#VHMLeftKidney" || tmp == "#VHMRightKidney"))
+   {
+      answer[U("error_message")] = json::value::string(U("only test tissue blocks in kidneys"));
+      return;
+   }
+
+   //extract parameters from json request
    params["x_dimension"] = jvalue.at("x_dimension").as_double();
    params["y_dimension"] = jvalue.at("y_dimension").as_double();
    params["z_dimension"] = jvalue.at("z_dimension").as_double();
@@ -50,13 +63,6 @@ void parse_json(json::value const &jvalue, json::value &answer)
    params["z_rotation"] = jvalue.at("z_rotation").as_double();
    
 
-   for (auto it=organ_origins.begin(); it != organ_origins.end(); it++)
-    {
-        std::cout << it->first << it->second << std::endl;
-    }
-
-    
-   std::string tmp = organ_split(target); 
    std::string organ_name = mapping[organ_split(target)];
    std::cout << "target url: " << target << " target: " << tmp << " " << "standard: " << organ_name << std::endl;
 
@@ -67,14 +73,16 @@ void parse_json(json::value const &jvalue, json::value &answer)
 
    
    Surface_mesh tissue_mesh;
-   std::vector<Point> points;
+   std::vector<Point> points; //center of voxels inside the tissue block
    tissue_transform(params, tissue_mesh, points, 10);
 
    Mymesh my_tissue(tissue_mesh);
    my_tissue.create_aabb_tree();
 
+   //core function
    std::vector<std::pair<std::string, double>> result = collision_detection_single_tissue(total_body[organ_name], my_tissue, points);
 
+   //print result
    std::cout << "result:\nlabel         percentage" << std::endl;
    for (auto s: result) {std::cout << s.first << " " << s.second << std::endl;}
    
@@ -82,34 +90,36 @@ void parse_json(json::value const &jvalue, json::value &answer)
    double tissue_volume = params["x_dimension"] * params["y_dimension"] * params["z_dimension"];
    for (int i = 0; i < result.size(); i++)
    {
-       auto res = result[i];
-       json::value AS;
-       
-       auto node_name = res.first;
-       AS[U("node_name")] = json::value::string(U(node_name));
-       AS[U("label")] = json::value::string(U(mapping_node_label[node_name]));
-       AS[U("OntologyID")] = json::value::string(U(mapping_node_ontology[node_name]));
+      auto res = result[i];
+      json::value AS;
+      
+      auto node_name = res.first;
+      SpatialEntity &se = mapping_node_spatial_entity[node_name];
+      AS[U("node_name")] = json::value::string(U(node_name));
+      AS[U("label")] = json::value::string(U(se.label));
+      AS[U("representation_of")] = json::value::string(U(se.representation_of));
+      AS[U("id")] = json::value::string("http://purl.org/ccf/latest/ccf.owl" + se.source_spatial_entity + "_" + node_name);
 
-       if (res.second < 0) 
-       {
-           AS[U("percentage")] = json::value(0);
-           AS[U("is_closed")] = json::value(false);
-       }
-       else
-       {
-           AS[U("percentage")] = json::value(res.second);
-           AS[U("volume")] = json::value(res.second * tissue_volume);
-           AS[U("is_closed")] = json::value(true);
-       }
-       
-       answer[i] = AS;
+      if (res.second < 0) 
+      {
+         AS[U("percentage")] = json::value(0);
+         AS[U("is_closed")] = json::value(false);
+      }
+      else
+      {
+         AS[U("percentage")] = json::value(res.second);
+         AS[U("volume")] = json::value(res.second * tissue_volume);
+         AS[U("is_closed")] = json::value(true);
+      }
+      
+      answer[i] = AS;
    }
 
 }
 
+
 void handle_get(http_request request)
 {
-   // TRACE(L"\nhandle GET\n");
 
    std::cout << "\nhandle GET" << std::endl;
 
@@ -126,12 +136,10 @@ void handle_get(http_request request)
    request.reply(status_codes::OK, answer);
 }
 
-void handle_request(
-   http_request request,
-   std::function<void(json::value const &, json::value &)> action)
+void handle_request(http_request request, std::function<void(json::value const &, json::value &)> action)
 {
-//    auto answer = json::value::object();
-   json::value answer;
+   auto answer = json::value::object();
+   // json::value answer;
 
    request
       .extract_json()
@@ -155,7 +163,10 @@ void handle_request(
       })
       .wait();
 
-   request.reply(status_codes::OK, answer);
+   if (answer != json::value::null())
+      request.reply(status_codes::OK, answer);
+   else
+      request.reply(status_codes::OK, json::value::array());
 }
 
 void handle_post(http_request request)
@@ -172,15 +183,17 @@ void handle_post(http_request request)
 
 int main()
 {
-    std::string whole_model_path = "";
-    std::string asct_b_file_path = "/home/catherine/data/model/ASCT-B_3D_Models_Mapping.csv";
-    std::string body_path = "/home/catherine/data/model/plain_filling_hole";
+   //origins are stored in a json file
+   std::string whole_model_path = "";
+   std::string asct_b_file_path = "/home/catherine/data/model/ASCT-B_3D_Models_Mapping.csv";
+   std::string body_path = "/home/catherine/data/model/plain_filling_hole";
 
-    gen_origin(whole_model_path, organ_origins);
-    load_ASCT_B(asct_b_file_path, mapping, mapping_node_ontology, mapping_node_label);
-    load_all_organs(body_path, total_body);
+   // load origins
+   gen_origin(whole_model_path, organ_origins);
+   load_ASCT_B(asct_b_file_path, mapping, mapping_node_spatial_entity);
+   load_all_organs(body_path, total_body);
 
-   http_listener listener("http://192.168.1.100:12345/restdemo");
+   http_listener listener("http://192.168.1.100:12345/get-collisions");
 
    listener.support(methods::GET,  handle_get);
    listener.support(methods::POST, handle_post);
