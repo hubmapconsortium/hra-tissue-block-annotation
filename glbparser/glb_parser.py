@@ -1,20 +1,21 @@
 # created by Lu Chen on 05/01/2022
 # OMG, It's May!
+import argparse
 import numpy as np
 import os
-
 from pygltflib import GLTF2
 
 
-def glb_plain_parser(organ: str, output_dir):
-    file = "C:/Users/catherine/Desktop/Research/ccf-releases/v1.1/models/" + organ + '.glb'
+def glb_plain_parser(input_dir, organ: str, output_dir):
 
+    # file = "C:/Users/catherine/Desktop/Research/ccf-releases/v1.1/models/" + organ + '.glb'
+    file = os.path.join(input_dir, organ + '.glb')
     data_type_dict = {5121: 'uint8', 5123: 'uint16', 5125: 'uint32', 5126: 'float32'}
     number_of_components = {'SCALAR': 1, 'VEC2': 2, 'VEC3': 3, 'VEC4': 4, 'MAT2': 4, 'MAT3': 9, 'MAT4': 16}
 
     glb = GLTF2.load(file)
     binary_blob = glb.binary_blob()
-    output_dir = os.path.join(output_dir, organ)
+    output_organ_dir = os.path.join(output_dir, organ)
 
     for mesh in glb.meshes:
 
@@ -42,13 +43,13 @@ def glb_plain_parser(organ: str, output_dir):
             count=points_accessor.count * 3,
         ).reshape((-1, 3))
 
-        save_single_mesh(points, triangles, mesh_name, output_dir)
+        save_single_mesh(points, triangles, mesh_name, output_organ_dir)
 
 
 def save_single_mesh(points, triangles, mesh_name, output_dir):
 
     if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
+        os.makedirs(output_dir)
 
     output_path = os.path.join(output_dir, mesh_name + '.off')
 
@@ -65,22 +66,25 @@ def save_single_mesh(points, triangles, mesh_name, output_dir):
         print("   {} has {} points, {} triangle faces\n".format(mesh_name, len(points), len(triangles)))
 
 
-def main():
+if __name__ == "__main__":
+    # input_dir = "C:/Users/catherine/Desktop/Research/ccf-releases/v1.1/models/"
+    # output_dir = "C:/Users/catherine/Desktop/Research/hubmap/models/plain"
 
-    input_path = "C:/Users/catherine/Desktop/Research/ccf-releases/v1.1/models/"
-    output_path = "C:/Users/catherine/Desktop/Research/hubmap/models/plain"
-    files = os.listdir(input_path)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input_dir')
+    parser.add_argument('output_dir')
+    args = parser.parse_args()
 
+    input_dir = args.input_dir
+    output_dir = args.output_dir
+
+    files = os.listdir(input_dir)
     for f in files:
         if f.endswith('.glb'):
             organ = f[:-4]
             print("start parsing {}\n".format(organ))
-            glb_plain_parser(organ, output_path)
+            glb_plain_parser(input_dir, organ, output_dir)
             print("end parsing {}\n".format(organ))
-
-
-if __name__ == "__main__":
-    main()
 
 
 
