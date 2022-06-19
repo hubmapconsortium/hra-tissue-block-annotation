@@ -34,7 +34,11 @@
 *.idea
 *.ipynb_checkpoints
 
-
+# Build directories
 build/
 build*/
 **/build*/*
+
+# vscode
+.vscode/
+**/.vscode/
