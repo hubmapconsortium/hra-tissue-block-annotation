@@ -119,7 +119,7 @@ void load_all_organs(const std::string &body_path, std::unordered_map<std::strin
 }
 
 
-void gen_origin(const std::string &whole_model_path, std::unordered_map<std::string, Eigen::Vector3d> &organ_origins)
+void gen_origin(const std::string &organ_origins_file, std::unordered_map<std::string, Eigen::Vector3d> &organ_origins)
 {
 
     Eigen::Vector3d VHFRightKidney_origin(-0.1087215, 0.1985958, -0.1344381);
@@ -127,19 +127,59 @@ void gen_origin(const std::string &whole_model_path, std::unordered_map<std::str
     Eigen::Vector3d VHMRightKidney_origin(-0.09692713, 0.22901, -0.05137664);
     Eigen::Vector3d VHMLeftKidney_origin(0.03373008, 0.2498251, -0.06865281);
 
-    organ_origins["VH_F_Kidney_R"] = VHFRightKidney_origin;
-    organ_origins["VH_F_Kidney_L"] = VHFLeftKidney_origin;
-    organ_origins["VH_M_Kidney_R"] = VHMRightKidney_origin;
-    organ_origins["VH_M_Kidney_L"] = VHMLeftKidney_origin;
+    organ_origins["#VHFRightKidney"] = VHFRightKidney_origin;
+    organ_origins["#VHFLeftKidney"] = VHFLeftKidney_origin;
+    organ_origins["#VHMRightKidney"] = VHMRightKidney_origin;
+    organ_origins["#VHMLeftKidney"] = VHMLeftKidney_origin;
+
+    std::ifstream origins(organ_origins_file);
+
+    if (!origins.is_open()) throw std::runtime_error("could not open " + organ_origins_file);
+    
+    std::string line;
+    if (origins.good())
+    {
+        std::getline(origins, line); //skip the first line
+
+        std::vector<std::string> row;
+        std::string word;
+
+        while (std::getline(origins, line))
+        {
+            row.clear();
+            std::stringstream ss(line);
+            while (std::getline(ss, word, ','))
+            {
+                row.push_back(word);
+            }
+
+            auto target = row[0];
+            auto x_translation = std::stod(row[1]);
+            auto y_translation = std::stod(row[2]);
+            auto z_translation = std::stod(row[3]);
+
+            // handle suffix
+            size_t len = target.size();
+            if (target[len - 4] == 'V' && target[len-2] == '.') target = target.substr(0, len-4);
+
+            Eigen::Vector3d origin(x_translation, y_translation, z_translation);
+            organ_origins[target] = origin;
+
+
+        }
+
+    }
+
 }
 
-void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, std::string> &mapping, std::unordered_map<std::string, std::string> &mapping_node_ontology, std::unordered_map<std::string, std::string> &mapping_node_label)
+void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, std::string> &mapping, std::unordered_map<std::string, SpatialEntity> &mapping_node_spatial_entity)
 {
-
-    mapping["#VHFLeftKidney"] = "VH_F_Kidney_L";
+    
     mapping["#VHFRightKidney"] = "VH_F_Kidney_R";
-    mapping["#VHMLeftKidney"] = "VH_M_Kidney_L";
+    mapping["#VHFLeftKidney"] = "VH_F_Kidney_L";
     mapping["#VHMRightKidney"] = "VH_M_Kidney_R";
+    mapping["#VHMLeftKidney"] = "VH_M_Kidney_L";
+    
 
     std::ifstream asct_b(file_path);
 
@@ -168,6 +208,7 @@ void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, s
         }
 
         auto anatomical_structure_of = row[0];
+        auto source_spatial_entity = row[1];
         auto node_name = row[2];
         auto label = row[3];
         auto ontologyID = row[4];
@@ -179,8 +220,10 @@ void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, s
         
         if (node_name != "-")
         {
-            mapping_node_ontology[node_name] = representation_of;
-            mapping_node_label[node_name] = label;
+            // mapping_node_ontology[node_name] = representation_of;
+            // mapping_node_label[node_name] = label;
+            SpatialEntity spatial_entity(anatomical_structure_of, source_spatial_entity, node_name, label, representation_of, glb_file);
+            mapping_node_spatial_entity[node_name] = spatial_entity; 
 
         }
 
@@ -200,7 +243,8 @@ std::string organ_split(const std::string &url)
     if (url.substr(len-4, len) == "V1.1") tmp = url.substr(0, len-4);
     else tmp = url;
 
-    size_t pos = tmp.find("#");    
-    return tmp.substr(pos);
+    size_t start = tmp.find("#"); 
+    size_t end = tmp.find("_");
+    return tmp.substr(start, end - start);
 
 }

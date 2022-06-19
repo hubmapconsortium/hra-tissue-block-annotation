@@ -7,10 +7,10 @@
 using namespace boost::filesystem;
 
 
-void check_manifold(std::string body_path)
+void check_manifold(std::string &body_path, std::string &output_path)
 {
     std::ofstream output_file;
-    output_file.open("output.csv");
+    output_file.open(output_path);
     output_file << "organ,mesh,2-manifold,closed\n";
 
     for (directory_entry& organ_path : directory_iterator(body_path)) 
@@ -51,10 +51,19 @@ void check_manifold(std::string body_path)
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
-    std::string body_path = "/home/luchen/plain";
-    check_manifold(body_path);
+    // std::string body_path = "/home/catherine/data/model/plain_with_holes/";
+    if (argc < 3)
+    {
+        std::cout << "Please provide body_path and output_file name (csv file)!" << std::endl;
+        return 0;
+    }
+
+    std::string body_path = std::string(argv[1]);
+    std::string output_file = std::string(argv[2]);
+
+    check_manifold(body_path, output_file);
     std::cout << "end" << std::endl;
     return 0;
 }

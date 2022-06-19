@@ -34,5 +34,7 @@
 *.idea
 *.ipynb_checkpoints
 
+
 build/
 build*/
+**/build*/*
