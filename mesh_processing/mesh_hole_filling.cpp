@@ -92,9 +92,18 @@ void mesh_hole_fill_refine_fair(const fs::path &file_path, const fs::path &outpu
 // and with no more than a given number of edges (if specified).
 int main(int argc, char* argv[])
 {
-  std::string body_path = "/home/catherine/data/model/plain_with_holes/";
-  std::string output_dir = "/home/catherine/data/model/plain_filling_hole";
+  // std::string body_path = "/home/catherine/data/model/plain_with_holes/";
+  // std::string output_dir = "/home/catherine/data/model/plain_filling_hole";
 
+  if (argc < 3)
+  {
+    std::cout << "Please provide body_path and output_dir!" << std::endl;
+    return 0;
+  }
+
+  std::string body_path = std::string(argv[1]);
+  std::string output_dir = std::string(argv[2]);
+  
   if (!fs::exists(output_dir)) fs::create_directory(output_dir);
   fs::path dir(output_dir);
   for (fs::directory_entry& organ_path : fs::directory_iterator(body_path)) 
