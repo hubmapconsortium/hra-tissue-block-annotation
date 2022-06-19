@@ -38,11 +38,11 @@ void parse_json(json::value const &jvalue, json::value &answer)
 
 
    auto target = jvalue.at("target").as_string();
-   auto tmp = organ_split(target); 
-   std::cout << "target url: " << target << " target: " << tmp << " " << std::endl;
+   auto refence_organ_name = organ_split(target); 
+   std::cout << "target url: " << target << " target: " << refence_organ_name << " " << std::endl;
    
    // only test for kidneys, will test other organs soon.
-   if (!(tmp == "#VHFLeftKidney" || tmp == "#VHFRightKidney" || tmp == "#VHMLeftKidney" || tmp == "#VHMRightKidney"))
+   if (!(refence_organ_name == "#VHFLeftKidney" || refence_organ_name == "#VHFRightKidney" || refence_organ_name == "#VHMLeftKidney" || refence_organ_name == "#VHMRightKidney"))
    {
       answer[U("error_message")] = json::value::string(U("only test tissue blocks in kidneys"));
       return;
@@ -63,10 +63,10 @@ void parse_json(json::value const &jvalue, json::value &answer)
    params["z_rotation"] = jvalue.at("z_rotation").as_double();
    
 
-   std::string organ_name = mapping[organ_split(target)];
-   std::cout << "target url: " << target << " target: " << tmp << " " << "standard: " << organ_name << std::endl;
+   std::string organ_file_name = mapping[organ_split(target)];
+   std::cout << "target url: " << target << " target: " << refence_organ_name << " " << "organ file name: " << organ_file_name << std::endl;
 
-   Eigen::Vector3d origin = organ_origins[organ_name];
+   Eigen::Vector3d origin = organ_origins[refence_organ_name];
    params["x_origin"] = origin(0);
    params["y_origin"] = origin(1);
    params["z_origin"] = origin(2);
@@ -80,7 +80,7 @@ void parse_json(json::value const &jvalue, json::value &answer)
    my_tissue.create_aabb_tree();
 
    //core function
-   std::vector<std::pair<std::string, double>> result = collision_detection_single_tissue(total_body[organ_name], my_tissue, points);
+   std::vector<std::pair<std::string, double>> result = collision_detection_single_tissue(total_body[organ_file_name], my_tissue, points);
 
    //print result
    std::cout << "result:\nlabel         percentage" << std::endl;
@@ -100,7 +100,7 @@ void parse_json(json::value const &jvalue, json::value &answer)
       AS[U("representation_of")] = json::value::string(U(se.representation_of));
       AS[U("id")] = json::value::string("http://purl.org/ccf/latest/ccf.owl" + se.source_spatial_entity + "_" + node_name);
 
-      if (res.second < 0) 
+      if (res.second < 0)  
       {
          AS[U("percentage")] = json::value(0);
          AS[U("is_closed")] = json::value(false);
@@ -138,8 +138,7 @@ void handle_get(http_request request)
 
 void handle_request(http_request request, std::function<void(json::value const &, json::value &)> action)
 {
-   auto answer = json::value::object();
-   // json::value answer;
+   json::value answer;
 
    request
       .extract_json()
@@ -181,19 +180,30 @@ void handle_post(http_request request)
 }
 
 
-int main()
+int main(int argc, char **argv)
 {
-   //origins are stored in a json file
-   std::string whole_model_path = "";
-   std::string asct_b_file_path = "/home/catherine/data/model/ASCT-B_3D_Models_Mapping.csv";
-   std::string body_path = "/home/catherine/data/model/plain_filling_hole";
+
+   // std::string organ_origins_file_path = "/home/catherine/data/model/organ_origins_meter.csv";
+   // std::string asct_b_file_path = "/home/catherine/data/model/ASCT-B_3D_Models_Mapping.csv";
+   // std::string body_path = "/home/catherine/data/model/plain_filling_hole";
+   if (argc < 6)
+   {
+      std::cout << "Please provide the organ_origins_file_path, asct_b_file_path, body_path(model_path) server IP and port number!" << std::endl;
+      return 0;
+   }
+
+   std::string organ_origins_file_path = std::string(argv[1]);
+   std::string asct_b_file_path = std::string(argv[2]);
+   std::string body_path = std::string(argv[3]);
+   std::string server_ip = std::string(argv[4]);
+   std::string port = std::string(argv[5]);
 
    // load origins
-   gen_origin(whole_model_path, organ_origins);
+   gen_origin(organ_origins_file_path, organ_origins);
    load_ASCT_B(asct_b_file_path, mapping, mapping_node_spatial_entity);
    load_all_organs(body_path, total_body);
 
-   http_listener listener("http://192.168.1.100:12345/get-collisions");
+   http_listener listener("http://" + server_ip + ":" + port + "/get-collisions");
 
    listener.support(methods::GET,  handle_get);
    listener.support(methods::POST, handle_post);
