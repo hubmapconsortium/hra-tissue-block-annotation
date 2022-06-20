@@ -1,5 +1,9 @@
 #include "mymesh.h"
 
+namespace PMP = CGAL::Polygon_mesh_processing;
+namespace fs = boost::filesystem;
+
+
 bool Mymesh::load_from_off(const std::string &file_path) {
     
     std::ifstream input(file_path);

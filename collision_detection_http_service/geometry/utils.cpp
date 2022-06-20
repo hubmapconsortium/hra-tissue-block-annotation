@@ -1,4 +1,6 @@
 #include "utils.h"
+
+namespace fs = boost::filesystem;
 #define PI 3.14159265
 
 void tissue_transform(std::unordered_map<std::string, double> &params, Surface_mesh &tissue_mesh, std::vector<Point> &points, int resolution=10)

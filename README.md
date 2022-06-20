@@ -62,7 +62,7 @@ We use CMake to configure the program with third-party dependencies and generate
 
 1. for collision detection and volume computation:
     ```bash
-    cd $collision_detection_project_root
+    cd $collision_detection_http_service
     mkdir build
     cd build
     cmake ..
@@ -70,39 +70,40 @@ We use CMake to configure the program with third-party dependencies and generate
     ```
 2. for hole filling:
     ```bash
-    cd $hole_filling_project_root
+    cd $mesh_processing
     mkdir build
     cd build
     cmake ..
     make
-    ```
-note: you need to change or specify the directory of 3D models. 
+    ``` 
 
 ## Usage
 ### Server side: 
 1. convert glb files of 3D models to off (Object File Format) files:
     ```bash
     cd $glbparser
-    python glb_parser.py
+    python glb_parser.py input_dir_3D_model_glb output_dir_3D_model_off
     ```
 2. hole filling for every mesh:
     ```bash
     cd $hole_filling_project_root/build
-    ./mesh_hole_filling
+    ./mesh_hole_filling body_path output_dir
     ```
+    note: body_path is the output directory of 3D models in off format, the directory of the body which contains all organs
 3. start http service and receive json request:
     ```bash
     cd $collision_detection_project_root/build
-    ./server2
+    ./server2 path_of_3d_model_origins.csv path_of_asct_b.csv body_path server_ip port 
+    e.g., ./server2 /home/catherine/data/model/organ_origins_meter.csv /home/catherine/data/model/ASCT-B_3D_Models_Mapping.csv /home/catherine/data/model/plain_filling_hole/ 192.168.1.100 12345
     ``` 
 
     Or directly download the meshes after step 1 and step 2 from Google Drive(link). So you can skip step 1 and step 2.
 
-note: you need to change or specify the directory of 3D models.
+    note: path_of_3d_model_origins.csv, path_of_asct_b.csv, examples of body_path are provided in **data** folder.
 
 ### Client side:
 
-POST http://server_ip:12345/restdemo
+POST http://server_ip:port/get-collisions
 
 - JSON request example
 ```json
@@ -128,20 +129,22 @@ POST http://server_ip:12345/restdemo
   ```json
 [
     {
-        "OntologyID": "http://purl.obolibrary.org/obo/UBERON_0004200",
+        "id": "http://purl.org/ccf/latest/ccf.owl#VHFemaleOrgans_VH_F_renal_pyramid_L_a",
         "is_closed": true,
         "label": "renal pyramid",
         "node_name": "VH_F_renal_pyramid_L_a",
-        "percentage": 0.010999999999999999,
-        "volume": 11
+        "percentage": 0,
+        "representation_of": "http://purl.obolibrary.org/obo/UBERON_0004200",
+        "volume": 0
     },
     {
-        "OntologyID": "http://purl.obolibrary.org/obo/UBERON_0002015",
+        "id": "http://purl.org/ccf/latest/ccf.owl#VHFemaleOrgans_VH_F_kidney_capsule_L",
         "is_closed": true,
         "label": "kidney capsule",
         "node_name": "VH_F_kidney_capsule_L",
-        "percentage": 0.062,
-        "volume": 62
+        "percentage": 0.059999999999999998,
+        "representation_of": "http://purl.obolibrary.org/obo/UBERON_0002015",
+        "volume": 60
     }
 ]
   ```

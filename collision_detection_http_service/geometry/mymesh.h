@@ -10,6 +10,7 @@
 #include<fstream>
 #include<iostream>
 #include<vector>
+#include<boost/filesystem.hpp>
 
 typedef CGAL::Simple_cartesian<double> Kernel;
 typedef Kernel::Point_3 Point;
@@ -27,9 +28,6 @@ typedef Surface_mesh::Face_index face_descriptor;
 typedef CGAL::Side_of_triangle_mesh<Surface_mesh, Kernel> Point_inside;
 
 namespace PMP = CGAL::Polygon_mesh_processing;
-using std::vector;
-
-#include<boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
 class Mymesh{

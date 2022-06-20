@@ -7,14 +7,10 @@
 #include <unordered_map>
 #include <Eigen/Dense>
 #include <math.h>
+#include<boost/filesystem.hpp>
 
 #include "mymesh.h"
 
-#include<boost/filesystem.hpp>
-// using namespace boost::filesystem;
-namespace fs = boost::filesystem;
-
-#define PI 3.14159265
 
 struct SpatialEntity {
 
