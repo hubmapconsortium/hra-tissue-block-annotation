@@ -23,7 +23,7 @@ target_link_libraries(server2 cpprestsdk::cpprest)
 # target_link_libraries(server PRIVATE cpprestsdk::cpprest)
 # target_link_libraries (server Eigen3::Eigen)
 # target_link_libraries(server PRIVATE geometry)
-# target_link_libraries(server ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
+## target_link_libraries(server ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
 
 set(Boost_USE_STATIC_LIBS OFF) 
 set(Boost_USE_MULTITHREADED ON)  
