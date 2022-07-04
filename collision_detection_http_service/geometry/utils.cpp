@@ -217,8 +217,8 @@ void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, s
         auto representation_of = row[5];
         auto glb_file = row[6];
 
-        if (anatomical_structure_of != "-")
-            mapping[anatomical_structure_of] = glb_file;
+        // if (anatomical_structure_of != "-")
+            // mapping[anatomical_structure_of] = glb_file;
         
         if (node_name != "-")
         {

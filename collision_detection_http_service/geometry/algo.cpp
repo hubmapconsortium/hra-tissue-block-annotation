@@ -5,17 +5,17 @@ std::vector<std::pair<std::string, double>> collision_detection_single_tissue(st
     auto aabbtree_tissue = tissue.get_aabb_tree();
     std::vector<std::pair<std::string, double>> result;
 
-
+    std::cout << "organ size: " << organ.size() << std::endl;
     for (int i = 0; i < organ.size(); i++)
     {
         auto AS = organ[i];
         
-        if (!AS.is_surface) continue;
+        if (!AS.is_surface) {std::cout << "not surface: " << AS.label << std::endl; continue;}
 
         auto aabbtree_AS = AS.get_aabb_tree();
         if (aabbtree_AS->do_intersect(*aabbtree_tissue))
         {
-
+            
             if (AS.is_closed) 
             {
                 double percentage = AS.percentage_points_inside(points);
