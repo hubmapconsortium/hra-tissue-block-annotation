@@ -101,7 +101,7 @@ We use CMake to configure the program with third-party dependencies and generate
     ```bash
     cd $collision_detection_http_service/build
     ./server2 path_of_3d_model_origins.csv path_of_asct_b.csv body_path server_ip port 
-    e.g., ./server2 /home/catherine/data/model/organ_origins_meter.csv /home/catherine/data/model/ASCT-B_3D_Models_Mapping.csv /home/catherine/data/model/plain_filling_hole/ 192.168.1.100 12345
+    e.g., ./server2 /home/catherine/data/model/organ_origins_meter_v1.2.csv /home/catherine/data/model/ASCT-B_3D_Models_Mapping_v1.2.csv /home/catherine/data/model/plain_filling_hole/ 192.168.1.100 12345
     ``` 
 
     Or directly download the meshes after step 1 and step 2 from Google Drive(link). So you can skip step 1 and step 2.
