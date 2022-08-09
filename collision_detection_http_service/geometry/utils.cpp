@@ -224,7 +224,10 @@ void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, s
             if (last_char == '\r' || last_char == '\n' || last_char == '\t') glb_file = glb_file.substr(0, n - 1);
 
             n = anatomical_structure_of.size();
-            if (n > 4 && anatomical_structure_of.substr(n-4, 4) == "V1.1") anatomical_structure_of = anatomical_structure_of.substr(0, n-4);
+
+            // end with V1.1 or V1.2 or any V*.* 
+            if (n > 4 && anatomical_structure_of[n-4] == 'V' && anatomical_structure_of[n-2] == '.') 
+                anatomical_structure_of = anatomical_structure_of.substr(0, n-4);
             
             mapping[anatomical_structure_of] = glb_file;
         }
@@ -252,9 +255,12 @@ std::string organ_split(const std::string &url)
     std::string tmp;
 
     size_t len = url.size();
-    if (url.substr(len-4, 4) == "V1.1") tmp = url.substr(0, len-4);
+    
+    // end with V1.1 or V1.2 or any V*.* 
+    if (url[len-4] == 'V' && url[len-2] == '.') tmp = url.substr(0, len-4);
     else tmp = url;
 
+    // end with _* like _Patch
     size_t start = tmp.find("#"); 
     size_t end = tmp.find("_");
     return tmp.substr(start, end - start);
