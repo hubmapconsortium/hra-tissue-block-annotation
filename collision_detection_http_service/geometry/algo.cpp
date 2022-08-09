@@ -29,18 +29,39 @@ std::vector<std::pair<std::string, double>> collision_detection_single_tissue(st
 
             Surface_mesh &mesh = tissue.get_raw_mesh();
             
-            bool is_contain = true;
+            // the tissue block is wholely inside the anatomical structure. 
+            bool is_contain_1 = true;
             for (auto vd: mesh.vertices())
             {
                 Point p = mesh.point(vd);
                 if (!AS.point_inside(p)) 
                 {
-                    is_contain = false; 
+                    is_contain_1 = false; 
                     break;
                 }
             }
 
-            if (is_contain) result.push_back({AS.label, 1.0});
+            // the anatomical structure is wholely inside the tissue block, still use the voxel-based algorithm, can be simplified to use the volume of the anatomical structure. 
+            bool is_contain_2 = true;
+            Surface_mesh &AS_raw_mesh = AS.get_raw_mesh();
+
+            for (auto vd: AS_raw_mesh.vertices())
+            {
+                Point p = AS_raw_mesh.point(vd);
+                
+                if (!tissue.point_inside(p))
+                    is_contain_2 = false;
+                break;
+            }
+
+    
+            if (is_contain_1) 
+                result.push_back({AS.label, 1.0});
+            else if (is_contain_2)
+            {
+                double percentage = AS.percentage_points_inside(points);
+                result.push_back({AS.label, percentage});
+            }
         }
     }
 
