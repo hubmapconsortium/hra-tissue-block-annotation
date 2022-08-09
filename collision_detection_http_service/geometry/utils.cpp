@@ -217,8 +217,18 @@ void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, s
         auto representation_of = row[5];
         auto glb_file = row[6];
 
-        // if (anatomical_structure_of != "-")
-            // mapping[anatomical_structure_of] = glb_file;
+        if (anatomical_structure_of != "-")
+        {
+            size_t n = glb_file.size();
+            char last_char = glb_file[n - 1];
+            if (last_char == '\r' || last_char == '\n' || last_char == '\t') glb_file = glb_file.substr(0, n - 1);
+
+            n = anatomical_structure_of.size();
+            if (n > 4 && anatomical_structure_of.substr(n-4, 4) == "V1.1") anatomical_structure_of = anatomical_structure_of.substr(0, n-4);
+            
+            mapping[anatomical_structure_of] = glb_file;
+        }
+        
         
         if (node_name != "-")
         {
@@ -242,7 +252,7 @@ std::string organ_split(const std::string &url)
     std::string tmp;
 
     size_t len = url.size();
-    if (url.substr(len-4, len) == "V1.1") tmp = url.substr(0, len-4);
+    if (url.substr(len-4, 4) == "V1.1") tmp = url.substr(0, len-4);
     else tmp = url;
 
     size_t start = tmp.find("#"); 

@@ -42,11 +42,19 @@ void parse_json(json::value const &jvalue, json::value &answer)
    std::cout << "target url: " << target << " target: " << refence_organ_name << " " << std::endl;
    
    // only test for kidneys, will test other organs soon.
-   if (!(refence_organ_name == "#VHFLeftKidney" || refence_organ_name == "#VHFRightKidney" || refence_organ_name == "#VHMLeftKidney" || refence_organ_name == "#VHMRightKidney"))
+   // if (!(refence_organ_name == "#VHFLeftKidney" || refence_organ_name == "#VHFRightKidney" || refence_organ_name == "#VHMLeftKidney" || refence_organ_name == "#VHMRightKidney"))
+   // {
+   //    answer[U("error_message")] = json::value::string(U("only test tissue blocks in kidneys"));
+   //    return;
+   // }
+
+   // test for all organs
+   if (mapping.find(refence_organ_name) == mapping.end()) 
    {
-      answer[U("error_message")] = json::value::string(U("only test tissue blocks in kidneys"));
+      std::cout << refence_organ_name << " doesn't exist in ASCT-B table!" << std::endl;
       return;
    }
+
 
    //extract parameters from json request
    params["x_dimension"] = jvalue.at("x_dimension").as_double();
