@@ -35,11 +35,11 @@ void parse_json(json::value const &jvalue, json::value &answer)
 {
    try 
    {
-
+         auto placement = jvalue.at("placement");
          std::unordered_map<std::string, double> params;
 
 
-         auto target = jvalue.at("target").as_string();
+         auto target = placement.at("target").as_string();
          auto refence_organ_name = organ_split(target); 
          std::cout << "target url: " << target << " target: " << refence_organ_name << " " << std::endl;
          
@@ -62,15 +62,15 @@ void parse_json(json::value const &jvalue, json::value &answer)
          params["x_dimension"] = jvalue.at("x_dimension").as_double();
          params["y_dimension"] = jvalue.at("y_dimension").as_double();
          params["z_dimension"] = jvalue.at("z_dimension").as_double();
-         params["x_scaling"] = jvalue.at("x_scaling").as_double();
-         params["y_scaling"] = jvalue.at("y_scaling").as_double();
-         params["z_scaling"] = jvalue.at("z_scaling").as_double();
-         params["x_translation"] = jvalue.at("x_translation").as_double();
-         params["y_translation"] = jvalue.at("y_translation").as_double();
-         params["z_translation"] = jvalue.at("z_translation").as_double();
-         params["x_rotation"] = jvalue.at("x_rotation").as_double();
-         params["y_rotation"] = jvalue.at("y_rotation").as_double();
-         params["z_rotation"] = jvalue.at("z_rotation").as_double();
+         params["x_scaling"] = placement.at("x_scaling").as_double();
+         params["y_scaling"] = placement.at("y_scaling").as_double();
+         params["z_scaling"] = placement.at("z_scaling").as_double();
+         params["x_translation"] = placement.at("x_translation").as_double();
+         params["y_translation"] = placement.at("y_translation").as_double();
+         params["z_translation"] = placement.at("z_translation").as_double();
+         params["x_rotation"] = placement.at("x_rotation").as_double();
+         params["y_rotation"] = placement.at("y_rotation").as_double();
+         params["z_rotation"] = placement.at("z_rotation").as_double();
          
 
          std::string organ_file_name = mapping[organ_split(target)];
