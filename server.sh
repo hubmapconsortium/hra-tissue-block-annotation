@@ -9,4 +9,4 @@ fi
 export PORT=${PORT:="8080"}
 export HOST=${HOST:="0.0.0.0"}
 
-./server2 model/organ_origins_meter.csv model/ASCT-B_3D_Models_Mapping.csv data/plain_filling_hole/ $HOST $PORT
+./server2 model/organ_origins_meter.csv model/ASCT-B_3D_Models_Mapping.csv model/plain_filling_hole/ $HOST $PORT
