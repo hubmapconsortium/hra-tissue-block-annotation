@@ -19,8 +19,10 @@ bool Mymesh::load_from_off(const std::string &file_path) {
 
     this->label = AS_name;
     this->is_surface = true;
-    if (CGAL::is_closed(this->mesh)) this->is_closed = true;
-    
+    if (CGAL::is_closed(this->mesh)){
+        this->is_closed = true;
+        this->volume = PMP::volume(this->mesh) * 1e9;
+    }
     return true;
 
 }
@@ -93,4 +95,40 @@ Mymesh::Mymesh(const Surface_mesh sm)
 {
     this->mesh = sm;
     triangulate_mesh();    
+}
+
+std::string Mymesh::to_wkt() 
+{
+    std::stringstream ss;
+	ss<<"POLYHEDRALSURFACE Z (";
+    bool lfirst = true;
+
+    for (face_descriptor f: mesh.faces())
+    {
+        if (lfirst) lfirst = false;
+        else ss << ",";
+
+        ss << "((";
+        bool first = true;
+        Point firstpoint;
+
+        for (vertex_descriptor v: vertices_around_face(mesh.halfedge(f), mesh))
+        {
+            if (first) 
+            {
+                firstpoint = mesh.point(v);
+                first = false;
+            }
+            else ss << ",";
+            Point p = mesh.point(v);
+            ss << p[0] << " " << p[1] << " " << p[2];
+        }
+
+        ss << "," << firstpoint[0] << " " << firstpoint[1] << " " << firstpoint[2];
+        ss << "))";
+
+    }
+    ss << ")";
+
+    return ss.str();
 }

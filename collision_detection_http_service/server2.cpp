@@ -1,6 +1,8 @@
 #include "algo.h"
 #include "utils.h"
 
+#include <chrono>
+
 #include <cpprest/http_listener.h>
 #include <cpprest/json.h>
 #pragma comment(lib, "cpprest_2_10")
@@ -87,15 +89,85 @@ void parse_json(json::value const &jvalue, json::value &answer)
          tissue_transform(params, tissue_mesh, points, 10);
 
          Mymesh my_tissue(tissue_mesh);
+
+         std::ofstream tissue_mesh_off("tissue_mesh_2.off");
+         tissue_mesh_off << tissue_mesh;
+         tissue_mesh_off.close();
+
+
          my_tissue.create_aabb_tree();
+         std::string tissue_str = my_tissue.to_wkt();
+
+         std::ofstream tissue_output_wkt;
+         tissue_output_wkt.open("tissue.wkt");
+         tissue_output_wkt << tissue_str;
+         tissue_output_wkt.close();
+
+
+         // //core function
+         // auto t1 = std::chrono::high_resolution_clock::now();
+         // std::vector<std::pair<std::string, double>> result = collision_detection_single_tissue(total_body[organ_file_name], my_tissue, points);
+         // auto t2 = std::chrono::high_resolution_clock::now();
+
+         // std::chrono::duration<double> duration2 = t2 - t1;
+         // std::cout << "collision detection function running time: " << duration2.count() << " seconds" << std::endl;  
+
+         // auto result_bb = collision_detection_bb(total_body[organ_file_name], my_tissue);
+
+         // //print result
+         // std::cout << "mesh collision detection result:\nlabel         percentage" << std::endl;
+         // for (auto s: result) {std::cout << s.first << " " << s.second << std::endl;}
+         // std::cout << "bounding box collision detection result: \nlabel" << std::endl;
+         // for (auto s: result_bb) {std::cout << s << std::endl; }
+
+         // //construct the response
+         // double tissue_volume = params["x_dimension"] * params["y_dimension"] * params["z_dimension"];
+         // for (int i = 0; i < result.size(); i++)
+         // {
+         //    auto res = result[i];
+         //    json::value AS;
+            
+         //    auto node_name = res.first;
+         //    SpatialEntity &se = mapping_node_spatial_entity[node_name];
+         //    AS[U("node_name")] = json::value::string(U(node_name));
+         //    AS[U("label")] = json::value::string(U(se.label));
+         //    AS[U("representation_of")] = json::value::string(U(se.representation_of));
+         //    AS[U("id")] = json::value::string("http://purl.org/ccf/latest/ccf.owl" + se.source_spatial_entity + "_" + node_name);
+
+         //    if (res.second < 0)  
+         //    {
+         //       AS[U("percentage")] = json::value(0);
+         //       AS[U("is_closed")] = json::value(false);
+         //    }
+         //    else
+         //    {
+         //       AS[U("percentage_of_tissue_block")] = json::value(res.second);
+         //       AS[U("volume")] = json::value(res.second * tissue_volume);
+         //       AS[U("percentage_of_AS")] = json::value(res.second * tissue_volume / )
+         //       AS[U("is_closed")] = json::value(true);
+         //    }
+            
+         //    answer[i] = AS;
+         // }
+
 
          //core function
-         std::vector<std::pair<std::string, double>> result = collision_detection_single_tissue(total_body[organ_file_name], my_tissue, points);
+         auto t1 = std::chrono::high_resolution_clock::now();
+         std::vector<std::pair<int, double>> result = collision_detection_single_tissue_2(total_body[organ_file_name], my_tissue, points);
+         auto t2 = std::chrono::high_resolution_clock::now();
 
+         std::chrono::duration<double> duration2 = t2 - t1;
+         std::cout << "collision detection function running time: " << duration2.count() << " seconds" << std::endl;  
+
+         auto result_bb = collision_detection_bb(total_body[organ_file_name], my_tissue);
+
+         auto &target_organ = total_body[organ_file_name];
          //print result
-         std::cout << "result:\nlabel         percentage" << std::endl;
+         std::cout << "mesh collision detection result:\nlabel         percentage" << std::endl;
          for (auto s: result) {std::cout << s.first << " " << s.second << std::endl;}
-         
+         std::cout << "bounding box collision detection result: \nlabel" << std::endl;
+         for (auto s: result_bb) {std::cout << s << std::endl; }
+
          //construct the response
          double tissue_volume = params["x_dimension"] * params["y_dimension"] * params["z_dimension"];
          for (int i = 0; i < result.size(); i++)
@@ -103,7 +175,7 @@ void parse_json(json::value const &jvalue, json::value &answer)
             auto res = result[i];
             json::value AS;
             
-            auto node_name = res.first;
+            auto node_name = target_organ[res.first].label;
             SpatialEntity &se = mapping_node_spatial_entity[node_name];
             AS[U("node_name")] = json::value::string(U(node_name));
             AS[U("label")] = json::value::string(U(se.label));
@@ -112,13 +184,16 @@ void parse_json(json::value const &jvalue, json::value &answer)
 
             if (res.second < 0)  
             {
-               AS[U("percentage")] = json::value(0);
+               AS[U("percentage_of_tissue_block")] = json::value(0);
                AS[U("is_closed")] = json::value(false);
+               AS[U("percentage_of_AS")] = json::value(0);
+               AS[U("volume")] = json::value(0);
             }
             else
             {
-               AS[U("percentage")] = json::value(res.second);
+               AS[U("percentage_of_tissue_block")] = json::value(res.second);
                AS[U("volume")] = json::value(res.second * tissue_volume);
+               AS[U("percentage_of_AS")] = json::value(res.second * tissue_volume / target_organ[res.first].volume);
                AS[U("is_closed")] = json::value(true);
             }
             

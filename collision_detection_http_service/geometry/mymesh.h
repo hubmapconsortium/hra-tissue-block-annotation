@@ -56,6 +56,8 @@ class Mymesh{
         std::string label;
         bool is_closed;
         bool is_surface;
+        double volume = 0.0;
+        std::string to_wkt();
 };
 
 #endif

@@ -44,6 +44,7 @@ void tissue_transform(std::unordered_map<std::string, double> &params, Surface_m
     Eigen::MatrixXd R_x(3, 3);
     Eigen::MatrixXd R_y(3, 3);
     Eigen::MatrixXd R_z(3, 3);
+    // Eigen::MatrixXd z_refect(3, 3);
 
     double radius_x = x_rotation * PI / 180;
     double radius_y = y_rotation * PI / 180;
@@ -59,11 +60,21 @@ void tissue_transform(std::unordered_map<std::string, double> &params, Surface_m
         sin(radius_z), cos(radius_z), 0.0,
         0.0, 0.0, 1.0;
 
-    Eigen::MatrixXd R = R_z * R_y * R_x;
+
+    // z_refect << 1, 0, 0, 0, 1, 0, 0, 0, -1;
+    
+    Eigen::MatrixXd R = R_x * R_y * R_z;
     Eigen::Vector3d T(x_translation, y_translation, z_translation);
+
+    std::cout << "translation vector: " << T << " " << "origin" << origin << std::endl;
    
     std::vector<vertex_descriptor> vd;
-    for (int i = 0; i < vertices.size(); i++) vertices[i] = (R*vertices[i] + T)/1000.0 + origin;
+    
+    for (int i = 0; i < vertices.size(); i++)
+    {   
+        vertices[i] = (R * vertices[i] + T)/1000.0 + origin;
+    }
+
     for (auto &vec: vertices)
     {
         Point p(vec(0), vec(1), vec(2));
@@ -104,6 +115,8 @@ void tissue_transform(std::unordered_map<std::string, double> &params, Surface_m
 void load_all_organs(const std::string &body_path, std::unordered_map<std::string, std::vector<Mymesh>> &total_body)
 {
     // std::string body_path = "/home/luchen/collision_detection_kidney_2/models/AS";
+    std::ofstream output_wkt;
+    output_wkt.open("output.wkt");
 
     for (fs::directory_entry& organ_path : fs::directory_iterator(body_path)) 
     {
@@ -115,8 +128,15 @@ void load_all_organs(const std::string &body_path, std::unordered_map<std::strin
             total_body[organ_name].push_back(Mymesh(file_path));
         }
 
-        for (auto &AS: total_body[organ_name]) AS.create_aabb_tree();
+        for (auto &AS: total_body[organ_name]) {
+            AS.create_aabb_tree();
+            // std::string as_wkt = AS.to_wkt();
+            // output_wkt << organ_name << "|" << AS.label << "|" << as_wkt << "\n";
+
+        }
     }
+
+    output_wkt.close();
 
 }
 
