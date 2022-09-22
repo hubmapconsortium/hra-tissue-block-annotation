@@ -253,10 +253,22 @@ void handle_request(http_request request, std::function<void(json::value const &
       })
       .wait();
 
+   // if (answer != json::value::null())
+   //    request.reply(status_codes::OK, answer);
+   // else
+   //    request.reply(status_codes::OK, json::value::array());
+   
+   http_response response(status_codes::OK);
+   response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
+
+
    if (answer != json::value::null())
-      request.reply(status_codes::OK, answer);
+      response.set_body(answer);
    else
-      request.reply(status_codes::OK, json::value::array());
+      response.set_body(json::value::array());
+   
+   request.reply(response);
+
 }
 
 void handle_post(http_request request)
@@ -270,6 +282,16 @@ void handle_post(http_request request)
    );
 }
 
+void handle_options(http_request request)
+{
+   http_response response(status_codes::OK);
+   response.headers().add(U("Allow"), U("GET, POST, OPTIONS"));
+   response.headers().add(U("Access-Control-Allow-Origin"), U("*"));
+   response.headers().add(U("Access-Control-Allow-Methods"), U("GET, POST, OPTIONS"));
+   response.headers().add(U("Access-Control-Allow-Headers"), U("Content-Type"));
+   request.reply(response);
+
+}
 
 int main(int argc, char **argv)
 {
@@ -298,6 +320,7 @@ int main(int argc, char **argv)
 
    listener.support(methods::GET,  handle_get);
    listener.support(methods::POST, handle_post);
+   listener.support(methods::OPTIONS, handle_options);
 
 
    try
