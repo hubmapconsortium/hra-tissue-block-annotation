@@ -182,17 +182,20 @@ void parse_json(json::value const &jvalue, json::value &answer)
             AS[U("representation_of")] = json::value::string(U(se.representation_of));
             AS[U("id")] = json::value::string("http://purl.org/ccf/latest/ccf.owl" + se.source_spatial_entity + "_" + node_name);
 
+            AS[U("tissue_volume")] = json::value(tissue_volume);
+            AS[U("AS_volume")] = json::value(target_organ[res.first].volume);
+            
             if (res.second < 0)  
             {
                AS[U("percentage_of_tissue_block")] = json::value(0);
                AS[U("is_closed")] = json::value(false);
                AS[U("percentage_of_AS")] = json::value(0);
-               AS[U("volume")] = json::value(0);
+               AS[U("intersection_volume")] = json::value(0);
             }
             else
             {
                AS[U("percentage_of_tissue_block")] = json::value(res.second);
-               AS[U("volume")] = json::value(res.second * tissue_volume);
+               AS[U("intersection_volume")] = json::value(res.second * tissue_volume);
                AS[U("percentage_of_AS")] = json::value(res.second * tissue_volume / target_organ[res.first].volume);
                AS[U("is_closed")] = json::value(true);
             }
