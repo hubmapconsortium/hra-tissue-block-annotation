@@ -132,6 +132,10 @@ POST http://server_ip:port/get-collisions
   
   }
   ```
+  - Request as a CURL command:
+  ```bash
+  curl -d '{"target":"http://purl.org/ccf/latest/ccf.owl#VHFLeftKidneyV1.1","x_dimension":10,"y_dimension":10,"z_dimension":10,"x_scaling":1,"y_scaling":1,"z_scaling":1,"x_rotation":0,"y_rotation":0,"z_rotation":0,"x_translation":6.508,"y_translation":110.468,"z_translation":38.79}' -H "Content-Type: application/json" -X post http://localhost:8080/get-collisions
+  ```
   - JSON response example
   ```json
 [
