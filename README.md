@@ -160,7 +160,7 @@ POST http://server_ip:port/get-collisions
   ```
   - Request as a CURL command:
   ```bash
-  curl -d '@examples/test-registration.json' -H "Content-Type: application/json" -X post http://localhost:8080/get-collisions
+  curl -d '@examples/test-registration.json' -H "Content-Type: application/json" -X POST http://localhost:8080/get-collisions
   ```
   - JSON response example
   ```json
@@ -217,7 +217,7 @@ POST http://server_ip:port/get-collisions
   ```
   - Request as a CURL command on staging server:
   ```bash
-  curl -d '@examples/test-registration.json' -H "Content-Type: application/json" -X post https://pfn8zf2gtu.us-east-2.awsapprunner.com/get-collisions
+  curl -d '@examples/test-registration.json' -H "Content-Type: application/json" -X POST https://pfn8zf2gtu.us-east-2.awsapprunner.com/get-collisions
   ```
   Input: [RUI Registration](examples/test-registration.json)
   Produces: [result](examples/test-registration-collisions.json)
