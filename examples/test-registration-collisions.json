@@ -1,0 +1,50 @@
+[
+  {
+    "AS_volume": 8361.985667661724,
+    "id": "http://purl.org/ccf/latest/ccf.owl#VHFemaleOrgans_VH_F_hilum_of_kidney_L",
+    "intersection_volume": 33,
+    "is_closed": true,
+    "label": "hilum of kidney",
+    "node_name": "VH_F_hilum_of_kidney_L",
+    "percentage_of_AS": 0.003946431064528223,
+    "percentage_of_tissue_block": 0.033,
+    "representation_of": "http://purl.obolibrary.org/obo/UBERON_0008716",
+    "tissue_volume": 1000
+  },
+  {
+    "AS_volume": 8149.50311414705,
+    "id": "http://purl.org/ccf/latest/ccf.owl#VHFemaleOrgans_VH_F_renal_pyramid_L_a",
+    "intersection_volume": 30,
+    "is_closed": true,
+    "label": "renal pyramid",
+    "node_name": "VH_F_renal_pyramid_L_a",
+    "percentage_of_AS": 0.0036812060293494207,
+    "percentage_of_tissue_block": 0.03,
+    "representation_of": "http://purl.obolibrary.org/obo/UBERON_0004200",
+    "tissue_volume": 1000
+  },
+  {
+    "AS_volume": 2480.1476405575104,
+    "id": "http://purl.org/ccf/latest/ccf.owl#VHFemaleOrgans_VH_F_renal_pyramid_L_b",
+    "intersection_volume": 59,
+    "is_closed": true,
+    "label": "renal pyramid",
+    "node_name": "VH_F_renal_pyramid_L_b",
+    "percentage_of_AS": 0.02378890636798438,
+    "percentage_of_tissue_block": 0.059,
+    "representation_of": "http://purl.obolibrary.org/obo/UBERON_0004200",
+    "tissue_volume": 1000
+  },
+  {
+    "AS_volume": 72301.89436880287,
+    "id": "http://purl.org/ccf/latest/ccf.owl#VHFemaleOrgans_VH_F_renal_column_L",
+    "intersection_volume": 825,
+    "is_closed": true,
+    "label": "renal column",
+    "node_name": "VH_F_renal_column_L",
+    "percentage_of_AS": 0.01141048940974878,
+    "percentage_of_tissue_block": 0.825,
+    "representation_of": "http://purl.obolibrary.org/obo/UBERON_0001284",
+    "tissue_volume": 1000
+  }
+]

@@ -115,43 +115,109 @@ POST http://server_ip:port/get-collisions
 - JSON request example
 ```json
 {
-    
+  "@context": "https://hubmapconsortium.github.io/hubmap-ontology/ccf-context.jsonld",
+  "@id": "http://purl.org/ccf/1.5/6d000077-6866-42e5-8af8-eb068239747a",
+  "@type": "SpatialEntity",
+  "creator": "a b",
+  "creator_first_name": "a",
+  "creator_last_name": "b",
+  "creation_date": "2022-10-19",
+  "ccf_annotations": [
+    "http://purl.obolibrary.org/obo/UBERON_0002015",
+    "http://purl.obolibrary.org/obo/UBERON_0008716",
+    "http://purl.obolibrary.org/obo/UBERON_0000362",
+    "http://purl.obolibrary.org/obo/UBERON_0001228",
+    "http://purl.obolibrary.org/obo/UBERON_0004200",
+    "http://purl.obolibrary.org/obo/UBERON_0001225",
+    "http://purl.obolibrary.org/obo/UBERON_0001284",
+    "http://purl.obolibrary.org/obo/UBERON_0002189"
+  ],
+  "x_dimension": 10,
+  "y_dimension": 10,
+  "z_dimension": 10,
+  "dimension_units": "millimeter",
+  "placement": {
+    "@context": "https://hubmapconsortium.github.io/hubmap-ontology/ccf-context.jsonld",
+    "@id": "http://purl.org/ccf/1.5/6d000077-6866-42e5-8af8-eb068239747a_placement",
+    "@type": "SpatialPlacement",
     "target": "http://purl.org/ccf/latest/ccf.owl#VHFLeftKidneyV1.1",
-    "x_dimension": 10,
-    "y_dimension": 10,
-    "z_dimension": 10,
+    "placement_date": "2022-10-19",
     "x_scaling": 1,
     "y_scaling": 1,
     "z_scaling": 1,
+    "scaling_units": "ratio",
     "x_rotation": 0,
     "y_rotation": 0,
     "z_rotation": 0,
-    "x_translation": 6.508,
-    "y_translation": 110.468,
-    "z_translation": 38.79
-  
+    "rotation_order": "XYZ",
+    "rotation_units": "degree",
+    "x_translation": 25.536,
+    "y_translation": 94.007,
+    "z_translation": 38.79,
+    "translation_units": "millimeter"
   }
+}
+  ```
+  - Request as a CURL command:
+  ```bash
+  curl -d '@examples/test-registration.json' -H "Content-Type: application/json" -X POST http://localhost:8080/get-collisions
   ```
   - JSON response example
   ```json
 [
-    {
-        "id": "http://purl.org/ccf/latest/ccf.owl#VHFemaleOrgans_VH_F_renal_pyramid_L_a",
-        "is_closed": true,
-        "label": "renal pyramid",
-        "node_name": "VH_F_renal_pyramid_L_a",
-        "percentage": 0,
-        "representation_of": "http://purl.obolibrary.org/obo/UBERON_0004200",
-        "volume": 0
-    },
-    {
-        "id": "http://purl.org/ccf/latest/ccf.owl#VHFemaleOrgans_VH_F_kidney_capsule_L",
-        "is_closed": true,
-        "label": "kidney capsule",
-        "node_name": "VH_F_kidney_capsule_L",
-        "percentage": 0.059999999999999998,
-        "representation_of": "http://purl.obolibrary.org/obo/UBERON_0002015",
-        "volume": 60
-    }
+  {
+    "AS_volume": 8361.985667661724,
+    "id": "http://purl.org/ccf/latest/ccf.owl#VHFemaleOrgans_VH_F_hilum_of_kidney_L",
+    "intersection_volume": 33,
+    "is_closed": true,
+    "label": "hilum of kidney",
+    "node_name": "VH_F_hilum_of_kidney_L",
+    "percentage_of_AS": 0.003946431064528223,
+    "percentage_of_tissue_block": 0.033,
+    "representation_of": "http://purl.obolibrary.org/obo/UBERON_0008716",
+    "tissue_volume": 1000
+  },
+  {
+    "AS_volume": 8149.50311414705,
+    "id": "http://purl.org/ccf/latest/ccf.owl#VHFemaleOrgans_VH_F_renal_pyramid_L_a",
+    "intersection_volume": 30,
+    "is_closed": true,
+    "label": "renal pyramid",
+    "node_name": "VH_F_renal_pyramid_L_a",
+    "percentage_of_AS": 0.0036812060293494207,
+    "percentage_of_tissue_block": 0.03,
+    "representation_of": "http://purl.obolibrary.org/obo/UBERON_0004200",
+    "tissue_volume": 1000
+  },
+  {
+    "AS_volume": 2480.1476405575104,
+    "id": "http://purl.org/ccf/latest/ccf.owl#VHFemaleOrgans_VH_F_renal_pyramid_L_b",
+    "intersection_volume": 59,
+    "is_closed": true,
+    "label": "renal pyramid",
+    "node_name": "VH_F_renal_pyramid_L_b",
+    "percentage_of_AS": 0.02378890636798438,
+    "percentage_of_tissue_block": 0.059,
+    "representation_of": "http://purl.obolibrary.org/obo/UBERON_0004200",
+    "tissue_volume": 1000
+  },
+  {
+    "AS_volume": 72301.89436880287,
+    "id": "http://purl.org/ccf/latest/ccf.owl#VHFemaleOrgans_VH_F_renal_column_L",
+    "intersection_volume": 825,
+    "is_closed": true,
+    "label": "renal column",
+    "node_name": "VH_F_renal_column_L",
+    "percentage_of_AS": 0.01141048940974878,
+    "percentage_of_tissue_block": 0.825,
+    "representation_of": "http://purl.obolibrary.org/obo/UBERON_0001284",
+    "tissue_volume": 1000
+  }
 ]
   ```
+  - Request as a CURL command on staging server:
+  ```bash
+  curl -d '@examples/test-registration.json' -H "Content-Type: application/json" -X POST https://pfn8zf2gtu.us-east-2.awsapprunner.com/get-collisions
+  ```
+  Input: [RUI Registration](examples/test-registration.json)
+  Produces: [result](examples/test-registration-collisions.json)
