@@ -9,6 +9,13 @@
 #include <fstream>
 #include <vector>
 #include <set>
+
+#include <CGAL/IO/OFF_reader.h>
+#include <CGAL/Polygon_mesh_processing/orient_polygon_soup.h>
+#include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
+#include <CGAL/Polygon_mesh_processing/orientation.h>
+
+
 typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
 typedef Kernel::Point_3                                     Point;
 typedef CGAL::Surface_mesh<Point>                           Mesh;
@@ -39,6 +46,24 @@ bool is_small_hole(halfedge_descriptor h, Mesh & mesh,
 }
 
 
+void load_non_manifold_mesh(std::string file_path, Mesh &mesh)
+{
+  std::ifstream input(file_path);
+  std::vector<Point> points;
+  std::vector<std::vector<std::size_t> > polygons;
+
+  if (!input || !CGAL::read_OFF(input, points, polygons) || points.empty())
+  {
+    std::cerr << "Cannot open file " << std::endl;
+    return;
+  }
+
+  CGAL::Polygon_mesh_processing::orient_polygon_soup(points, polygons);
+  CGAL::Polygon_mesh_processing::polygon_soup_to_polygon_mesh(points, polygons, mesh);
+
+}
+
+
 void mesh_hole_fill_refine_fair(const fs::path &file_path, const fs::path &output_organ_dir)
 {
 
@@ -48,10 +73,11 @@ void mesh_hole_fill_refine_fair(const fs::path &file_path, const fs::path &outpu
   
   std::ifstream input(file_path.string());
   if ( !input || !(input >> mesh) || mesh.is_empty() ) {
-    std::cerr << file_path << " Not a valid off file." << std::endl;
-    return;
-  }
+    std::cerr << file_path << " Not a manifold mesh." << std::endl;
+    load_non_manifold_mesh(file_path.string(), mesh);
 
+  }
+  
   // Both of these must be positive in order to be considered
   double max_hole_diam = 100.0;
   int max_num_hole_edges = 100000000;
@@ -73,9 +99,9 @@ void mesh_hole_fill_refine_fair(const fs::path &file_path, const fs::path &outpu
                                                                      h,
                                                                      std::back_inserter(patch_facets),
                                                                      std::back_inserter(patch_vertices)));
-    std::cout << "* Number of facets in constructed patch: " << patch_facets.size() << std::endl;
-    std::cout << "  Number of vertices in constructed patch: " << patch_vertices.size() << std::endl;
-    std::cout << "  Is fairing successful: " << success << std::endl;
+    // std::cout << "* Number of facets in constructed patch: " << patch_facets.size() << std::endl;
+    // std::cout << "  Number of vertices in constructed patch: " << patch_vertices.size() << std::endl;
+    // std::cout << "  Is fairing successful: " << success << std::endl;
     ++nb_holes;
   }
   std::cout << nb_holes << " holes have been filled" << std::endl;
