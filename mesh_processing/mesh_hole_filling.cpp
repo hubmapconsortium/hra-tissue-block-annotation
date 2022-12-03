@@ -45,7 +45,7 @@ bool is_small_hole(halfedge_descriptor h, Mesh & mesh,
   return true;
 }
 
-
+// load non-manifold
 void load_non_manifold_mesh(std::string file_path, Mesh &mesh)
 {
   std::ifstream input(file_path);
@@ -74,6 +74,7 @@ void mesh_hole_fill_refine_fair(const fs::path &file_path, const fs::path &outpu
   std::ifstream input(file_path.string());
   if ( !input || !(input >> mesh) || mesh.is_empty() ) {
     std::cerr << file_path << " Not a manifold mesh." << std::endl;
+    //fix non-manifold meshes
     load_non_manifold_mesh(file_path.string(), mesh);
 
   }
