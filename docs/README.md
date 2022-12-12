@@ -39,7 +39,4 @@ Experimental data contain 3D organ models from [CCF 3D Reference Object Library]
 
 ### Visualization
 
-<div class="video-container">
-    <img src="./pilot4.png" height="650" width="100%"> </img>
-</div>
-
+![Pilot Image](pilot4.png)
