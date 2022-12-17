@@ -5,7 +5,7 @@ std::vector<std::pair<std::string, double>> collision_detection_single_tissue(st
     auto aabbtree_tissue = tissue.get_aabb_tree();
     std::vector<std::pair<std::string, double>> result;
 
-    std::cout << "organ size: " << organ.size() << std::endl;
+    // std::cout << "organ size: " << organ.size() << std::endl;
     for (int i = 0; i < organ.size(); i++)
     {
         auto AS = organ[i];
@@ -89,7 +89,7 @@ std::vector<std::pair<int, double>> collision_detection_single_tissue_2(std::vec
     auto aabbtree_tissue = tissue.get_aabb_tree();
     std::vector<std::pair<int, double>> result;
 
-    std::cout << "organ size: " << organ.size() << std::endl;
+    // std::cout << "organ size: " << organ.size() << std::endl;
     for (int i = 0; i < organ.size(); i++)
     {
         auto &AS = organ[i];

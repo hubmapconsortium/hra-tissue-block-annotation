@@ -43,7 +43,6 @@ void parse_json(json::value const &jvalue, json::value &answer)
 
          auto target = placement.at("target").as_string();
          auto refence_organ_name = organ_split(target); 
-         std::cout << "target url: " << target << " target: " << refence_organ_name << " " << std::endl;
          
          // only test for kidneys, will test other organs soon.
          // if (!(refence_organ_name == "#VHFLeftKidney" || refence_organ_name == "#VHFRightKidney" || refence_organ_name == "#VHMLeftKidney" || refence_organ_name == "#VHMRightKidney"))
@@ -90,18 +89,18 @@ void parse_json(json::value const &jvalue, json::value &answer)
 
          Mymesh my_tissue(tissue_mesh);
 
-         std::ofstream tissue_mesh_off("tissue_mesh_2.off");
-         tissue_mesh_off << tissue_mesh;
-         tissue_mesh_off.close();
+         // std::ofstream tissue_mesh_off("tissue_mesh_2.off");
+         // tissue_mesh_off << tissue_mesh;
+         // tissue_mesh_off.close();
 
 
          my_tissue.create_aabb_tree();
-         std::string tissue_str = my_tissue.to_wkt();
+         // std::string tissue_str = my_tissue.to_wkt();
 
-         std::ofstream tissue_output_wkt;
-         tissue_output_wkt.open("tissue.wkt");
-         tissue_output_wkt << tissue_str;
-         tissue_output_wkt.close();
+         // std::ofstream tissue_output_wkt;
+         // tissue_output_wkt.open("tissue.wkt");
+         // tissue_output_wkt << tissue_str;
+         // tissue_output_wkt.close();
 
 
          // //core function
@@ -157,7 +156,7 @@ void parse_json(json::value const &jvalue, json::value &answer)
          auto t2 = std::chrono::high_resolution_clock::now();
 
          std::chrono::duration<double> duration2 = t2 - t1;
-         std::cout << "collision detection function running time: " << duration2.count() << " seconds" << std::endl;  
+         // std::cout << "collision detection function running time: " << duration2.count() << " seconds" << std::endl;  
 
          auto result_bb = collision_detection_bb(total_body[organ_file_name], my_tissue);
 
