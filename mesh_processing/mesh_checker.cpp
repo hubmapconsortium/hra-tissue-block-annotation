@@ -11,7 +11,7 @@ void check_manifold(std::string &body_path, std::string &output_path)
 {
     std::ofstream output_file;
     output_file.open(output_path);
-    output_file << "organ,mesh,2-manifold,closed\n";
+    output_file << "organ,mesh,2-manifold,closed,self-intersection,watertight\n";
 
     for (directory_entry& organ_path : directory_iterator(body_path)) 
     {
@@ -28,27 +28,45 @@ void check_manifold(std::string &body_path, std::string &output_path)
             // std::cout << name << std::endl;
             if (!success) 
             {
-                std::cout << name << " is not 2-manifold" << std::endl;
-                output_file << organ_name <<"," << name << "," << "No" << "," << "-\n";
+                std::cout << organ_name << " " << name << " is not 2-manifold" << std::endl;
+                output_file << organ_name << "," << name << "," << "No,-,-\n";
             } 
             else
             {
-                bool is_closed = CGAL::is_closed(m.get_raw_mesh());
+                Surface_mesh &raw_mesh = m.get_raw_mesh();
+
+                bool is_self_intersected = PMP::does_self_intersect(raw_mesh);
+                bool is_closed = CGAL::is_closed(raw_mesh);
+                
+                output_file << organ_name << "," << name << ",Yes,";
                 if (!is_closed) 
                 {
-                    std::cout << name << " is not closed" << std::endl;
-                    output_file << organ_name << "," << name <<"," << "Yes" << "," << "No\n";
+                    std::cout << organ_name << " " << name << " is not closed" << std::endl;
+                    output_file << "No,";
                 }
                 else
                 {
-                    output_file << organ_name << "," << name << "," << "Yes" << "," <<"Yes\n"; 
+                    output_file << "Yes,"; 
                 }
 
+                if (is_self_intersected)
+                {
+                    std::cout << organ_name << " " << name << " has-intersections";
+                    output_file << "Yes,";
+                }
+                else
+                {
+                    output_file << "No,";
+                }
+
+                if (!is_self_intersected && is_closed) output_file << "Yes\n";
+                else output_file << "No\n";               
 
             }
         }
     }
 }
+
 
 
 int main(int argc, char* argv[])
