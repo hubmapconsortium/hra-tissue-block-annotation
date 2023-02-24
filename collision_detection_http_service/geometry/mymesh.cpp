@@ -21,7 +21,15 @@ bool Mymesh::load_from_off(const std::string &file_path) {
     this->is_surface = true;
     if (CGAL::is_closed(this->mesh)){
         this->is_closed = true;
-        this->volume = PMP::volume(this->mesh) * 1e9;
+    }
+    // else std::cout << this->label << " is not closed" << std::endl;
+    this->volume = PMP::volume(this->mesh) * 1e9;
+
+    if (AS_name.find("Skin") != std::string::npos || AS_name.find("skin") != std::string::npos)
+    {
+        this->volume = PMP::area(this->mesh) * 0.001 * 1e9;
+        std::cout << AS_name << "total skin: " << PMP::volume(this->mesh) * 1e9 << " surface within 1mm: " << this->volume << std::endl;
+
     }
     return true;
 
