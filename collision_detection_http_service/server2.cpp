@@ -37,11 +37,16 @@ void display_json(
 //parse json
 void parse_json(json::value const &jvalue, json::value &answer)
 {
+   // for test
+   // std::string tissue_output_path = "tissue_mesh_2.off";
    try 
    {
          auto placement = jvalue.at("placement");
          std::unordered_map<std::string, double> params;
          auto target = placement.at("target").as_string();
+
+         // for test
+         // if (jvalue.has_field("tissue_block_id")) tissue_output_path = jvalue.at("tissue_block_id").as_string() + ".off";
 
          //extract parameters from json request
          params["x_dimension"] = jvalue.at("x_dimension").as_double();
@@ -98,7 +103,8 @@ void parse_json(json::value const &jvalue, json::value &answer)
 
          Mymesh my_tissue(tissue_mesh);
 
-         // std::ofstream tissue_mesh_off("tissue_mesh_2.off");
+         // for test
+         // std::ofstream tissue_mesh_off("./tissue_blocks/" + tissue_output_path);
          // tissue_mesh_off << tissue_mesh;
          // tissue_mesh_off.close();
 
