@@ -1,5 +1,6 @@
 #include "algo.h"
 #include "utils.h"
+#include "json_utils.cpp"
 
 #include <chrono>
 
@@ -23,6 +24,7 @@ std::unordered_map<std::string, Eigen::Vector3d> organ_origins;                 
 std::unordered_map<std::string, std::string> mapping;                               //mapping from standard organ name(e.g., #VHFLeftKidney) to glb file name without suffix(e.g., VH_F_Kidney_L)
 std::unordered_map<std::string, std::vector<Mymesh>> total_body;                    //mapping from organ name(glb file name) to vector of meshes of a certain organ
 std::unordered_map<std::string, SpatialEntity> mapping_node_spatial_entity;         // mapping from AS to its information in asct-b table 
+std::unordered_map<std::string, Placement> mapping_placement;                       // mapping from source plcement to target placement(including rotation, scaling, translation parameters)
 
 //display json
 void display_json(
@@ -35,30 +37,16 @@ void display_json(
 //parse json
 void parse_json(json::value const &jvalue, json::value &answer)
 {
+   // for test
+   // std::string tissue_output_path = "tissue_mesh_2.off";
    try 
    {
          auto placement = jvalue.at("placement");
          std::unordered_map<std::string, double> params;
-
-
          auto target = placement.at("target").as_string();
-         auto refence_organ_name = organ_split(target); 
-         std::cout << "target url: " << target << " target: " << refence_organ_name << " " << std::endl;
-         
-         // only test for kidneys, will test other organs soon.
-         // if (!(refence_organ_name == "#VHFLeftKidney" || refence_organ_name == "#VHFRightKidney" || refence_organ_name == "#VHMLeftKidney" || refence_organ_name == "#VHMRightKidney"))
-         // {
-         //    answer[U("error_message")] = json::value::string(U("only test tissue blocks in kidneys"));
-         //    return;
-         // }
 
-         // test for all organs
-         if (mapping.find(refence_organ_name) == mapping.end()) 
-         {
-            std::cout << refence_organ_name << " doesn't exist in ASCT-B table!" << std::endl;
-            return;
-         }
-
+         // for test
+         // if (jvalue.has_field("tissue_block_id")) tissue_output_path = jvalue.at("tissue_block_id").as_string() + ".off";
 
          //extract parameters from json request
          params["x_dimension"] = jvalue.at("x_dimension").as_double();
@@ -73,12 +61,37 @@ void parse_json(json::value const &jvalue, json::value &answer)
          params["x_rotation"] = placement.at("x_rotation").as_double();
          params["y_rotation"] = placement.at("y_rotation").as_double();
          params["z_rotation"] = placement.at("z_rotation").as_double();
+
+         if (!(mapping_placement.find(target) == mapping_placement.end()))
+         {
+            Placement &placement = mapping_placement[target];
+            target = placement.target;
+            params["x_translation"] *= placement.x_scaling;
+            params["y_translation"] *= placement.y_scaling;
+            params["z_translation"] *= placement.z_scaling;
+            // other transformations here. 
+         }
+
+         auto reference_organ_name = organ_split(target); 
          
+         // only test for kidneys, will test other organs soon.
+         // if (!(reference_organ_name == "#VHFLeftKidney" || reference_organ_name == "#VHFRightKidney" || reference_organ_name == "#VHMLeftKidney" || reference_organ_name == "#VHMRightKidney"))
+         // {
+         //    answer[U("error_message")] = json::value::string(U("only test tissue blocks in kidneys"));
+         //    return;
+         // }
 
+         // test for all organs
+         if (mapping.find(reference_organ_name) == mapping.end()) 
+         {
+            std::cout << reference_organ_name << " doesn't exist in ASCT-B table!" << std::endl;
+            return;
+         }
+         
          std::string organ_file_name = mapping[organ_split(target)];
-         std::cout << "target url: " << target << " target: " << refence_organ_name << " " << "organ file name: " << organ_file_name << std::endl;
+         std::cout << "target url: " << target << " target: " << reference_organ_name << " " << "organ file name: " << organ_file_name << std::endl;
 
-         Eigen::Vector3d origin = organ_origins[refence_organ_name];
+         Eigen::Vector3d origin = organ_origins[reference_organ_name];
          params["x_origin"] = origin(0);
          params["y_origin"] = origin(1);
          params["z_origin"] = origin(2);
@@ -90,18 +103,19 @@ void parse_json(json::value const &jvalue, json::value &answer)
 
          Mymesh my_tissue(tissue_mesh);
 
-         std::ofstream tissue_mesh_off("tissue_mesh_2.off");
-         tissue_mesh_off << tissue_mesh;
-         tissue_mesh_off.close();
+         // for test
+         // std::ofstream tissue_mesh_off("./tissue_blocks/" + tissue_output_path);
+         // tissue_mesh_off << tissue_mesh;
+         // tissue_mesh_off.close();
 
 
          my_tissue.create_aabb_tree();
-         std::string tissue_str = my_tissue.to_wkt();
+         // std::string tissue_str = my_tissue.to_wkt();
 
-         std::ofstream tissue_output_wkt;
-         tissue_output_wkt.open("tissue.wkt");
-         tissue_output_wkt << tissue_str;
-         tissue_output_wkt.close();
+         // std::ofstream tissue_output_wkt;
+         // tissue_output_wkt.open("tissue.wkt");
+         // tissue_output_wkt << tissue_str;
+         // tissue_output_wkt.close();
 
 
          // //core function
@@ -157,7 +171,7 @@ void parse_json(json::value const &jvalue, json::value &answer)
          auto t2 = std::chrono::high_resolution_clock::now();
 
          std::chrono::duration<double> duration2 = t2 - t1;
-         std::cout << "collision detection function running time: " << duration2.count() << " seconds" << std::endl;  
+         // std::cout << "collision detection function running time: " << duration2.count() << " seconds" << std::endl;  
 
          auto result_bb = collision_detection_bb(total_body[organ_file_name], my_tissue);
 
@@ -177,6 +191,7 @@ void parse_json(json::value const &jvalue, json::value &answer)
             
             auto node_name = target_organ[res.first].label;
             SpatialEntity &se = mapping_node_spatial_entity[node_name];
+            AS[U("organ")] = json::value::string(U(organ_file_name));
             AS[U("node_name")] = json::value::string(U(node_name));
             AS[U("label")] = json::value::string(U(se.label));
             AS[U("representation_of")] = json::value::string(U(se.representation_of));
@@ -302,22 +317,24 @@ int main(int argc, char **argv)
    // std::string organ_origins_file_path = "/home/catherine/data/model/organ_origins_meter.csv";
    // std::string asct_b_file_path = "/home/catherine/data/model/ASCT-B_3D_Models_Mapping.csv";
    // std::string body_path = "/home/catherine/data/model/plain_filling_hole";
-   if (argc < 6)
+   if (argc < 7)
    {
-      std::cout << "Please provide the organ_origins_file_path, asct_b_file_path, body_path(model_path) server IP and port number!" << std::endl;
+      std::cout << "Please provide the organ_origins_file_path, asct_b_file_path, body_path(model_path), reference_organ_json_file, server IP and port number!" << std::endl;
       return 0;
    }
 
    std::string organ_origins_file_path = std::string(argv[1]);
    std::string asct_b_file_path = std::string(argv[2]);
    std::string body_path = std::string(argv[3]);
-   std::string server_ip = std::string(argv[4]);
-   std::string port = std::string(argv[5]);
+   std::string reference_organ_json_file = std::string(argv[4]);
+   std::string server_ip = std::string(argv[5]);
+   std::string port = std::string(argv[6]);
 
    // load origins
    gen_origin(organ_origins_file_path, organ_origins);
    load_ASCT_B(asct_b_file_path, mapping, mapping_node_spatial_entity);
    load_all_organs(body_path, total_body);
+   load_organ_transformation(reference_organ_json_file, mapping_placement);
 
    http_listener listener("http://" + server_ip + ":" + port + "/get-collisions");
 

@@ -66,7 +66,7 @@ void tissue_transform(std::unordered_map<std::string, double> &params, Surface_m
     Eigen::MatrixXd R = R_x * R_y * R_z;
     Eigen::Vector3d T(x_translation, y_translation, z_translation);
 
-    std::cout << "translation vector: " << T << " " << "origin" << origin << std::endl;
+    // std::cout << "translation vector: " << T << " " << "origin" << origin << std::endl;
    
     std::vector<vertex_descriptor> vd;
     
@@ -181,8 +181,8 @@ void gen_origin(const std::string &organ_origins_file, std::unordered_map<std::s
             auto z_translation = std::stod(row[3]);
 
             // handle suffix
-            size_t len = target.size();
-            if (target[len - 4] == 'V' && target[len-2] == '.') target = target.substr(0, len-4);
+            // size_t len = target.size();
+            // if (target[len - 4] == 'V' && target[len-2] == '.') target = target.substr(0, len-4);
 
             Eigen::Vector3d origin(x_translation, y_translation, z_translation);
             organ_origins[target] = origin;
@@ -243,11 +243,9 @@ void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, s
             char last_char = glb_file[n - 1];
             if (last_char == '\r' || last_char == '\n' || last_char == '\t') glb_file = glb_file.substr(0, n - 1);
 
-            n = anatomical_structure_of.size();
-
             // end with V1.1 or V1.2 or any V*.* 
-            if (n > 4 && anatomical_structure_of[n-4] == 'V' && anatomical_structure_of[n-2] == '.') 
-                anatomical_structure_of = anatomical_structure_of.substr(0, n-4);
+            // if (n > 4 && anatomical_structure_of[n-4] == 'V' && anatomical_structure_of[n-2] == '.') 
+            //     anatomical_structure_of = anatomical_structure_of.substr(0, n-4);
             
             mapping[anatomical_structure_of] = glb_file;
         }
@@ -272,17 +270,15 @@ void load_ASCT_B(const std::string &file_path, std::unordered_map<std::string, s
 
 std::string organ_split(const std::string &url)
 {
-    std::string tmp;
 
     size_t len = url.size();
     
     // end with V1.1 or V1.2 or any V*.* 
-    if (url[len-4] == 'V' && url[len-2] == '.') tmp = url.substr(0, len-4);
-    else tmp = url;
+    // if (url[len-4] == 'V' && url[len-2] == '.') tmp = url.substr(0, len-4);
+    // else tmp = url;
 
-    // end with _* like _Patch
-    size_t start = tmp.find("#"); 
-    size_t end = tmp.find("_");
-    return tmp.substr(start, end - start);
+    // start from # (including #)
+    size_t start = url.find("#"); 
+    return url.substr(start);
 
 }
