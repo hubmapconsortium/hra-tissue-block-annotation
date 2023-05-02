@@ -42,6 +42,7 @@ std::vector<std::pair<std::string, double>> collision_detection_single_tissue(st
             }
 
             // the anatomical structure is wholely inside the tissue block, still use the voxel-based algorithm, can be simplified to use the volume of the anatomical structure. 
+            // must use the volume of the anatomical structure when the tissue block is really large. Haven't implemented it yet because tissue block cannot be very large in reality.
             bool is_contain_2 = true;
             Surface_mesh &AS_raw_mesh = AS.get_raw_mesh();
 
