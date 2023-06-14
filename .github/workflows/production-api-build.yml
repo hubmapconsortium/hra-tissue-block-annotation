@@ -5,8 +5,34 @@ on:
     branches: ['main']
 
 jobs:
+  tests:
+    name: 'Run Tests'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: main
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - run: |
+          npm ci
+          # command for running tests
+          npm run test
+
   deploy:
     name: 'Deploy'
+    needs: tests
     runs-on: ubuntu-latest
 
     steps:
@@ -32,7 +58,4 @@ jobs:
           IMAGE_TAG: latest
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-      # - name: Run the testcases
-      #   run: npm run test
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAGq
