@@ -33,8 +33,9 @@ void load_organ_transformation(const std::string &json_file_path, std::unordered
                                                             x_scaling, y_scaling, z_scaling,
                                                             x_translation, y_translation, z_translation,
                                                             x_rotation, y_rotation, z_rotation);
+            
         }
-
+        adjust_placement_target_ancestor(mapping_placement);
         // for (int i = 0; i < placement.size(); i++) 
         // {
         //     auto item = placement[i];
@@ -96,4 +97,47 @@ json::value read_json_file(std::string const & json_file_path)
     }
 
     return output;
+}
+
+void adjust_placement_target_ancestor(std::unordered_map<std::string, Placement> &mapping_placement)
+{
+    for (auto &item: mapping_placement)
+    {
+        auto source = item.first;
+        auto &placement = item.second;        
+        auto target = placement.target;
+        auto x_scaling = placement.x_scaling;
+        auto y_scaling = placement.y_scaling;
+        auto z_scaling = placement.z_scaling;
+
+
+        while (mapping_placement.find(target) != mapping_placement.end())
+        {
+            auto &cur_placement = mapping_placement[target];
+            target = cur_placement.target;
+            x_scaling *= cur_placement.x_scaling;
+            y_scaling *= cur_placement.y_scaling;
+            z_scaling *= cur_placement.z_scaling;
+        }
+
+        placement.target = target;
+        placement.x_scaling = x_scaling;
+        placement.y_scaling = y_scaling;
+        placement.z_scaling = z_scaling;
+    }
+
+    // print_mapping_placement(mapping_placement);
+
+}
+
+void print_mapping_placement(std::unordered_map<std::string, Placement> &mapping_placement)
+{
+    for (auto &item: mapping_placement)
+    {
+        auto source = item.first;
+        auto &placement = item.second;
+
+        std::cout << "source: " << placement.source << " target: " << placement.target
+        << " x_scaling: " << placement.x_scaling << " y_scaling: " << placement.y_scaling << " z_scaling: " << placement.z_scaling << std::endl;     
+    }
 }
