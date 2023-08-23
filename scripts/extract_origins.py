@@ -4,7 +4,7 @@
 from urllib.request import urlopen
 import json
 import csv
-
+import argparse
 
 def gen_origins(url, output_csv):
     # store the URL in url as
@@ -34,5 +34,8 @@ def gen_origins(url, output_csv):
 if __name__ == "__main__":
 
     url = "https://raw.githubusercontent.com/hubmapconsortium/hubmap-ontology/master/source_data/generated-reference-spatial-entities.jsonld"
-    csv_file = "./organ_origins_meter.csv"
+    parser = argparse.ArgumentParser(description="extract origins")
+    parser.add_argument("--output_csv_file", type=str, help="Path to the output CSV file", default="../model/organ_origins_meter_v1.4.csv")
+    args = parser.parse_args()
+    csv_file = args.output_csv_file
     gen_origins(url, csv_file)
