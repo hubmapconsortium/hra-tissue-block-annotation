@@ -9,6 +9,8 @@ find_package(Eigen3 REQUIRED NO_MODULE)
 file(GLOB GEOMETRY_SRC_FILES geometry/*.cpp)
 add_library(geometry ${GEOMETRY_SRC_FILES})
 target_include_directories(geometry PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/geometry)
+target_link_libraries(geometry PUBLIC Eigen3::Eigen)
+target_link_libraries(geometry PUBLIC CGAL::CGAL)
 
 add_executable(mesh_checker mesh_checker.cpp)
 add_executable(mesh_hole_filling mesh_hole_filling.cpp)
