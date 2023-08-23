@@ -36,3 +36,8 @@ struct Placement {
 void load_organ_transformation(const std::string &json_file_path, std::unordered_map<std::string, Placement> &mapping_placement);
 
 json::value read_json_file(std::string const &json_file_path);
+
+// placement structure, V1.2 -> V1.1 -> V1.0
+void adjust_placement_target_ancestor(std::unordered_map<std::string, Placement> &mapping_placement);
+
+void print_mapping_placement(std::unordered_map<std::string, Placement> &mapping_placement);
