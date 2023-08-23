@@ -126,7 +126,7 @@ void adjust_placement_target_ancestor(std::unordered_map<std::string, Placement>
         placement.z_scaling = z_scaling;
     }
 
-    print_mapping_placement(mapping_placement);
+    // print_mapping_placement(mapping_placement);
 
 }
 
