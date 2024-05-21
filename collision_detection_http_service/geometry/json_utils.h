@@ -21,7 +21,7 @@ struct Placement {
     Placement() = default;
     Placement(const std::string &src, const std::string &tgt, double x_scl, double y_scl, double z_scl, 
             double x_trans, double y_trans, double z_trans, 
-            double x_rot, double y_rot, double z_rot): source(src), target(tgt), x_scaling(x_scl), y_scaling(y_scl), z_scaling(z_scl), x_translation(x_trans), y_translation(y_trans), z_translation(z_trans) {};
+            double x_rot, double y_rot, double z_rot): source(src), target(tgt), x_scaling(x_scl), y_scaling(y_scl), z_scaling(z_scl), x_translation(x_trans), y_translation(y_trans), z_translation(z_trans), x_rotation(x_rot), y_rotation(y_rot), z_rotation(z_rot) {};
 
     std::string source;
     std::string target;
@@ -41,3 +41,7 @@ json::value read_json_file(std::string const &json_file_path);
 void adjust_placement_target_ancestor(std::unordered_map<std::string, Placement> &mapping_placement);
 
 void print_mapping_placement(std::unordered_map<std::string, Placement> &mapping_placement);
+
+void load_organ_transformation_grlc(const std::string &reference_organ_grlc_file, std::unordered_map<std::string, Placement> &mapping_placement);
+
+void adjust_placement_target_ancestor_grlc(std::unordered_map<std::string, Placement> &mapping_placement);
