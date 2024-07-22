@@ -12,16 +12,6 @@ import csv
 as_url = "https://grlc.io/api-git/hubmapconsortium/ccf-grlc/subdir/mesh-collision/anatomical-structures.csv"
 patch_url = "https://grlc.io/api-git/hubmapconsortium/ccf-grlc/subdir/mesh-collision/placement-patches.csv"
 
-import json
-import requests
-import urllib.request
-from io import StringIO
-import csv
-
-
-as_url = "https://grlc.io/api-git/hubmapconsortium/ccf-grlc/subdir/mesh-collision/anatomical-structures.csv"
-patch_url = "https://grlc.io/api-git/hubmapconsortium/ccf-grlc/subdir/mesh-collision/placement-patches.csv"
-
 as_response = requests.get(url=as_url)
 patch_response = requests.get(url=patch_url)
 
