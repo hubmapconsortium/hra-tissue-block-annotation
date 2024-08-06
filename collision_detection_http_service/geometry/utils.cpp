@@ -120,7 +120,7 @@ void load_all_organs(const std::string &body_path, std::unordered_map<std::strin
 
     for (fs::directory_entry& organ_path : fs::directory_iterator(body_path)) 
     {
-        std::string organ_name = organ_path.path().stem().string();
+        std::string organ_name = organ_path.path().filename().string();
         std::cout << organ_name << std::endl;   
         for (fs::directory_entry& AS : fs::directory_iterator(organ_path)) 
         {
@@ -371,7 +371,7 @@ void load_ASCT_B_grlc(const std::string &asct_b_grlc_file_path, std::unordered_m
 
 std::string convert_url_to_file(const std::string &glb_url)
 {
-    std::string glb_file = glb_url;
+    std::string glb_file = glb_url.substr(0, glb_url.size() - 4);
     // https://ccf-ontology.hubmapconsortium.org/objects/v2.0/3d-vh-f-allen-brain.glb
     std::unordered_set<char> illegal_chars({'/', ':', '@', '&', '*'});
     for (int i = 0; i < glb_file.size(); i++)

@@ -144,19 +144,33 @@ void adjust_placement_target_ancestor_grlc(std::unordered_map<std::string, Place
         auto z_scaling = placement.z_scaling;
 
 
+        // while (source != target && mapping_placement.find(target) != mapping_placement.end())
+        // {
+        //     auto &cur_placement = mapping_placement[target];
+        //     //record the source to avoid https://purl.humanatlas.io/ref-organ/brain-female#primary
+        //     source = target;
+        //     target = cur_placement.target;
+        //     x_scaling *= cur_placement.x_scaling;
+        //     y_scaling *= cur_placement.y_scaling;
+        //     z_scaling *= cur_placement.z_scaling;
+        // }
+
+        // // in reference-organ-grlc.csv, the target will finally point to https://purl.humanatlas.io/ref-organ/brain-female#primary, so we need to use source to indicate
+        // placement.target = source;
+        // placement.x_scaling = x_scaling;
+        // placement.y_scaling = y_scaling;
+        // placement.z_scaling = z_scaling;
+
         while (mapping_placement.find(target) != mapping_placement.end())
         {
             auto &cur_placement = mapping_placement[target];
-            //record the source to avoid https://purl.humanatlas.io/ref-organ/brain-female#primary
-            source = target;
             target = cur_placement.target;
             x_scaling *= cur_placement.x_scaling;
             y_scaling *= cur_placement.y_scaling;
             z_scaling *= cur_placement.z_scaling;
         }
 
-        // in reference-organ-grlc.csv, the target will finally point to https://purl.humanatlas.io/ref-organ/brain-female#primary, so we need to use source to indicate
-        placement.target = source;
+        placement.target = target;
         placement.x_scaling = x_scaling;
         placement.y_scaling = y_scaling;
         placement.z_scaling = z_scaling;
@@ -220,7 +234,7 @@ void load_organ_transformation_grlc(const std::string &reference_organ_grlc_file
                                                             x_scaling, y_scaling, z_scaling,
                                                             x_translation, y_translation, z_translation,
                                                             x_rotation, y_rotation, z_rotation);
-    }                        
+    }        
     adjust_placement_target_ancestor_grlc(mapping_placement);
 }
 

@@ -23,7 +23,7 @@ std::map<utility::string_t, utility::string_t> dictionary;
 std::unordered_map<std::string, Eigen::Vector3d> organ_origins;                     //origins of organs
 std::unordered_map<std::string, std::string> mapping;                               //mapping from standard organ name(e.g., #VHFLeftKidney) to glb file name without suffix(e.g., VH_F_Kidney_L)
 std::unordered_map<std::string, std::vector<Mymesh>> total_body;                    //mapping from organ name(glb file name) to vector of meshes of a certain organ
-std::unordered_map<std::string, SpatialEntity> mapping_node_spatial_entity;         // mapping from AS to its information in asct-b table 
+std::unordered_map<std::string, SpatialEntityGRLC> mapping_node_spatial_entity_grlc;         // mapping from AS to its information in asct-b table 
 std::unordered_map<std::string, Placement> mapping_placement;                       // mapping from source plcement to target placement(including rotation, scaling, translation parameters)
 
 //display json
@@ -72,7 +72,9 @@ void parse_json(json::value const &jvalue, json::value &answer)
             // other transformations here. 
          }
 
-         auto reference_organ_name = organ_split(target); 
+         // no need to split
+         // auto reference_organ_name = organ_split(target); 
+         auto reference_organ_name = target;
          
          // only test for kidneys, will test other organs soon.
          // if (!(reference_organ_name == "#VHFLeftKidney" || reference_organ_name == "#VHFRightKidney" || reference_organ_name == "#VHMLeftKidney" || reference_organ_name == "#VHMRightKidney"))
@@ -82,13 +84,17 @@ void parse_json(json::value const &jvalue, json::value &answer)
          // }
 
          // test for all organs
+         if (mapping_placement.find(reference_organ_name) != mapping_placement.end()) {
+            reference_organ_name = mapping_placement[reference_organ_name].target;
+         }
+
          if (mapping.find(reference_organ_name) == mapping.end()) 
          {
             std::cout << reference_organ_name << " doesn't exist in ASCT-B table!" << std::endl;
             return;
          }
          
-         std::string organ_file_name = mapping[organ_split(target)];
+         std::string organ_file_name = convert_url_to_file(mapping[target]);
          std::cout << "target url: " << target << " target: " << reference_organ_name << " " << "organ file name: " << organ_file_name << std::endl;
 
          Eigen::Vector3d origin = organ_origins[reference_organ_name];
@@ -190,7 +196,7 @@ void parse_json(json::value const &jvalue, json::value &answer)
             json::value AS;
             
             auto node_name = target_organ[res.first].label;
-            SpatialEntity &se = mapping_node_spatial_entity[node_name];
+            SpatialEntityGRLC &se = mapping_node_spatial_entity_grlc[node_name];
             AS[U("organ")] = json::value::string(U(organ_file_name));
             AS[U("node_name")] = json::value::string(U(node_name));
             AS[U("label")] = json::value::string(U(se.label));
@@ -314,30 +320,40 @@ void handle_options(http_request request)
 int main(int argc, char **argv)
 {
 
-   // std::string organ_origins_file_path = "/home/catherine/data/model/organ_origins_meter.csv";
    // std::string asct_b_file_path = "/home/catherine/data/model/ASCT-B_3D_Models_Mapping.csv";
    // std::string body_path = "/home/catherine/data/model/plain_filling_hole";
-   if (argc < 7)
+   if (argc < 6)
    {
-      std::cout << "Please provide the organ_origins_file_path, asct_b_file_path, body_path(model_path), reference_organ_json_file, server IP and port number!" << std::endl;
+      std::cout << "Please provide the body_path(off_model_path), asct_b_file_path, reference_organ_json_file, server IP and port number!" << std::endl;
       return 0;
    }
 
-   std::string organ_origins_file_path = std::string(argv[1]);
-   std::string asct_b_file_path = std::string(argv[2]);
-   std::string body_path = std::string(argv[3]);
-   std::string reference_organ_json_file = std::string(argv[4]);
-   std::string server_ip = std::string(argv[5]);
-   std::string port = std::string(argv[6]);
+    std::string body_path = std::string(argv[1]);
+   std::string asct_b_grlc_file_path = std::string(argv[2]);
+   std::string reference_organ_grlc_file = std::string(argv[3]);
+   std::string server_ip = std::string(argv[4]);
+   std::string port = std::string(argv[5]);
 
    // load origins
-   gen_origin(organ_origins_file_path, organ_origins);
-   load_ASCT_B(asct_b_file_path, mapping, mapping_node_spatial_entity);
+   gen_origin_grlc(asct_b_grlc_file_path, organ_origins);
+   std::cout << "Organ origins: " << std::endl;
+   for (auto &origin: organ_origins) {
+      auto& p = origin.second;
+      std::cout << origin.first << " " << p.x() << " " << p.y() << " " << p.z() << std::endl;
+   }
+
+   load_ASCT_B_grlc(asct_b_grlc_file_path, mapping, mapping_node_spatial_entity_grlc);
+
+   std::cout << "mapping: " << std::endl;
+   for (auto &p: mapping) {
+      std::cout << p.first << " " << p.second << std::endl; 
+   }
+
    load_all_organs(body_path, total_body);
-   load_organ_transformation(reference_organ_json_file, mapping_placement);
+   load_organ_transformation_grlc(reference_organ_grlc_file, mapping_placement);
 
    http_listener listener("http://" + server_ip + ":" + port + "/get-collisions");
-
+   
    listener.support(methods::GET,  handle_get);
    listener.support(methods::POST, handle_post);
    listener.support(methods::OPTIONS, handle_options);
