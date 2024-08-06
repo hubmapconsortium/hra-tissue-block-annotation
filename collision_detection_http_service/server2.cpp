@@ -343,12 +343,6 @@ int main(int argc, char **argv)
    }
 
    load_ASCT_B_grlc(asct_b_grlc_file_path, mapping, mapping_node_spatial_entity_grlc);
-
-   std::cout << "mapping: " << std::endl;
-   for (auto &p: mapping) {
-      std::cout << p.first << " " << p.second << std::endl; 
-   }
-
    load_all_organs(body_path, total_body);
    load_organ_transformation_grlc(reference_organ_grlc_file, mapping_placement);
 
