@@ -10,7 +10,7 @@
 #include <vector>
 #include <set>
 
-#include <CGAL/IO/OFF_reader.h>
+#include <CGAL/IO/polygon_soup_io.h>
 #include <CGAL/Polygon_mesh_processing/orient_polygon_soup.h>
 #include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
 #include <CGAL/Polygon_mesh_processing/orientation.h>
@@ -52,7 +52,7 @@ void load_non_manifold_mesh(std::string file_path, Mesh &mesh)
   std::vector<Point> points;
   std::vector<std::vector<std::size_t> > polygons;
 
-  if (!input || !CGAL::read_OFF(input, points, polygons) || points.empty())
+  if (!input || !CGAL::IO::read_polygon_soup(file_path, points, polygons) || points.empty())
   {
     std::cerr << "Cannot open file " << std::endl;
     return;
@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
   for (fs::directory_entry& organ_path : fs::directory_iterator(body_path)) 
   {
         std::cout << std::endl << organ_path << std::endl;
-        fs::path organ_name = organ_path.path().stem();
+        fs::path organ_name = organ_path.path().filename();
         fs::path output_organ_dir = dir / organ_name;
         
         for (fs::directory_entry& AS : fs::directory_iterator(organ_path)) 
