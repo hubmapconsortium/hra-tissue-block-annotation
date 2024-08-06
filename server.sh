@@ -9,4 +9,4 @@ set -ev
 export PORT=${PORT:="8080"}
 export HOST=${HOST:="0.0.0.0"}
 
-collision_detection_http_service/build/server2 model/all_preprocessed_off_models_cgal/ model/asct-b-grlc.csv model/reference-organ-grlc.csv 0.0.0.0 8080
+./server2 model/all_preprocessed_off_models_cgal/ model/asct-b-grlc.csv model/reference-organ-grlc.csv 0.0.0.0 8080
