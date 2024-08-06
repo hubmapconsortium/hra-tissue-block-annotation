@@ -336,14 +336,11 @@ int main(int argc, char **argv)
 
    // load origins
    gen_origin_grlc(asct_b_grlc_file_path, organ_origins);
-   std::cout << "Organ origins: " << std::endl;
-   for (auto &origin: organ_origins) {
-      auto& p = origin.second;
-      std::cout << origin.first << " " << p.x() << " " << p.y() << " " << p.z() << std::endl;
-   }
-
+   // load ASCT-B
    load_ASCT_B_grlc(asct_b_grlc_file_path, mapping, mapping_node_spatial_entity_grlc);
+   // load organ models
    load_all_organs(body_path, total_body);
+   // load mapping placement
    load_organ_transformation_grlc(reference_organ_grlc_file, mapping_placement);
 
    http_listener listener("http://" + server_ip + ":" + port + "/get-collisions");
