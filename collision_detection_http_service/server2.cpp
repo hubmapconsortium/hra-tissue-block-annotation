@@ -201,7 +201,7 @@ void parse_json(json::value const &jvalue, json::value &answer)
             AS[U("node_name")] = json::value::string(U(node_name));
             AS[U("label")] = json::value::string(U(se.label));
             AS[U("representation_of")] = json::value::string(U(se.representation_of));
-            AS[U("id")] = json::value::string("http://purl.org/ccf/latest/ccf.owl" + se.source_spatial_entity + "_" + node_name);
+            AS[U("id")] = json::value::string(U(se.anatomical_structure_of));
 
             AS[U("tissue_volume")] = json::value(tissue_volume);
             AS[U("AS_volume")] = json::value(target_organ[res.first].volume);
