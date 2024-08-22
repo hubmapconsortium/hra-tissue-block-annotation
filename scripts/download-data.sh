@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 
 rm -rf model
 mkdir -p model
