@@ -11,16 +11,11 @@ FROM ubuntu:20.04
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update
 RUN apt install -y libssl-dev libboost-all-dev libgmp-dev libmpfr-dev libeigen3-dev libcgal-dev libcpprest-dev
-# install pip and packages
-RUN apt-get -y install python3-pip
-RUN pip install requests
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/build/server2 .
-COPY model model
 COPY server.sh .
-# download required data: AS and placement patches
-COPY scripts/download_data.py .
-RUN python3 download_data.py
+COPY scripts/download-data.sh .
+RUN ./download-data.sh
 
 ENV PORT 8080
 EXPOSE 8080
