@@ -10,7 +10,7 @@ RUN cmake .. && make
 FROM ubuntu:20.04
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update
-RUN apt install -y libssl-dev libboost-all-dev libgmp-dev libmpfr-dev libeigen3-dev libcgal-dev libcpprest-dev
+RUN apt install -y libssl-dev libboost-all-dev libgmp-dev libmpfr-dev libeigen3-dev libcgal-dev libcpprest-dev curl
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/build/server2 .
 COPY server.sh .
