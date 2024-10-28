@@ -23,7 +23,7 @@ bool Mymesh::load_from_off(const std::string &file_path) {
         this->is_closed = true;
     }
     // else std::cout << this->label << " is not closed" << std::endl;
-    this->volume = PMP::volume(this->mesh) * 1e9;
+    this->volume = abs(PMP::volume(this->mesh) * 1e9);
 
     if (AS_name.find("Skin") != std::string::npos || AS_name.find("skin") != std::string::npos)
     {
