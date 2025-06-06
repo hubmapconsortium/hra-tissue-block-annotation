@@ -369,15 +369,15 @@ void load_ASCT_B_grlc(const std::string &asct_b_grlc_file_path, std::unordered_m
 }
 
 
-std::string convert_url_to_file(const std::string &glb_url)
-{
-    std::string glb_file = glb_url.substr(0, glb_url.size() - 4);
-    // https://ccf-ontology.hubmapconsortium.org/objects/v2.0/3d-vh-f-allen-brain.glb
-    std::unordered_set<char> illegal_chars({'/', ':', '@', '&', '*'});
-    for (int i = 0; i < glb_file.size(); i++)
-    {
-        if (illegal_chars.find(glb_file[i]) != illegal_chars.end()) glb_file[i] = '_';
+std::string convert_url_to_file(const std::string& glb_url) {
+    std::stringstream ss(glb_url);
+    std::string token;
+    bool found_ref = false;
+
+    while (std::getline(ss, token, '/')) {
+        if (found_ref) return token;
+        if (token == "ref-organ") found_ref = true;
     }
 
-    return glb_file;
+    return "";
 }
