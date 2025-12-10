@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-VERSION=v2.3
+VERSION=v2.4
 off_url=https://cdn.humanatlas.io/hra-glb-off-releases/hra-glb-off-data.${VERSION}.zip
 
 rm -rf model
