@@ -3,6 +3,7 @@
 #include "json_utils.cpp"
 
 #include <chrono>
+#include <csignal>
 
 #include <cpprest/http_listener.h>
 #include <cpprest/json.h>
@@ -319,6 +320,13 @@ void handle_options(http_request request)
 
 int main(int argc, char **argv)
 {
+   // Block SIGINT/SIGTERM before any threads are created so that every thread
+   // inherits the mask; the main thread then waits for them with sigwait().
+   sigset_t shutdown_signals;
+   sigemptyset(&shutdown_signals);
+   sigaddset(&shutdown_signals, SIGINT);
+   sigaddset(&shutdown_signals, SIGTERM);
+   pthread_sigmask(SIG_BLOCK, &shutdown_signals, nullptr);
 
    // std::string asct_b_file_path = "/home/catherine/data/model/ASCT-B_3D_Models_Mapping.csv";
    // std::string body_path = "/home/catherine/data/model/plain_filling_hole";
@@ -360,7 +368,12 @@ int main(int argc, char **argv)
             })
          .wait();
 
-      while (true);
+      // Sleep until SIGINT/SIGTERM arrives instead of busy-waiting.
+      int signal_number = 0;
+      sigwait(&shutdown_signals, &signal_number);
+      std::cout << "\nreceived signal " << signal_number << ", shutting down" << std::endl;
+
+      listener.close().wait();
    }
    catch (std::exception const & e)
    {
